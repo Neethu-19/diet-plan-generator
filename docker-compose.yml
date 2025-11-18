@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: diet_planner_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: diet_planner
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: diet_planner_api
+    environment:
+      - DATABASE_URL=postgresql://user:password@postgres:5432/diet_planner
+      - VECTOR_DB_TYPE=faiss
+      - VECTOR_DB_PATH=/app/data/vector_db
+      - MODEL_NAME=microsoft/phi-2
+      - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+      - API_PORT=8000
+      - LOG_LEVEL=INFO
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./src:/app/src
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo 'Waiting for database...' &&
+        sleep 5 &&
+        echo 'Running migrations...' &&
+        alembic upgrade head &&
+        echo 'Starting API server...' &&
+        uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+
+  frontend:
+    image: nginx:alpine
+    container_name: diet_planner_frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

@@ -1,0 +1,589 @@
+[
+  {
+    "recipe_id": "breakfast_001",
+    "title": "Classic Oatmeal with Berries",
+    "ingredients": [
+      "1 cup rolled oats",
+      "2 cups water",
+      "1/2 cup fresh blueberries",
+      "1 tbsp honey",
+      "1/4 tsp cinnamon"
+    ],
+    "instructions": "Bring water to boil, add oats and reduce heat. Simmer for 5 minutes stirring occasionally. Top with berries, honey, and cinnamon.",
+    "kcal_total": 320,
+    "protein_g_total": 10,
+    "carbs_g_total": 62,
+    "fat_g_total": 5,
+    "dietary_tags": [
+      "vegan",
+      "vegetarian"
+    ],
+    "allergen_tags": [],
+    "prep_time_min": 10,
+    "cooking_skill": 1
+  },
+  {
+    "recipe_id": "breakfast_002",
+    "title": "Scrambled Eggs with Toast",
+    "ingredients": [
+      "3 large eggs",
+      "2 slices whole wheat bread",
+      "1 tbsp butter",
+      "Salt and pepper to taste"
+    ],
+    "instructions": "Beat eggs with salt and pepper. Melt butter in pan, add eggs and scramble until cooked. Toast bread and serve together.",
+    "kcal_total": 380,
+    "protein_g_total": 22,
+    "carbs_g_total": 28,
+    "fat_g_total": 18,
+    "dietary_tags": [
+      "vegetarian"
+    ],
+    "allergen_tags": [
+      "eggs",
+      "gluten",
+      "dairy"
+    ],
+    "prep_time_min": 8,
+    "cooking_skill": 1
+  },
+  {
+    "recipe_id": "lunch_001",
+    "title": "Grilled Chicken Salad",
+    "ingredients": [
+      "150g grilled chicken breast",
+      "2 cups mixed greens",
+      "1/2 cup cherry tomatoes",
+      "1/4 cup cucumber",
+      "2 tbsp olive oil",
+      "1 tbsp balsamic vinegar"
+    ],
+    "instructions": "Grill chicken breast and slice. Toss greens, tomatoes, and cucumber. Top with chicken and drizzle with oil and vinegar.",
+    "kcal_total": 420,
+    "protein_g_total": 38,
+    "carbs_g_total": 12,
+    "fat_g_total": 24,
+    "dietary_tags": [
+      "omnivore"
+    ],
+    "allergen_tags": [],
+    "prep_time_min": 20,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "lunch_002",
+    "title": "Quinoa Buddha Bowl",
+    "ingredients": [
+      "1 cup cooked quinoa",
+      "1/2 cup chickpeas",
+      "1 cup roasted vegetables",
+      "2 tbsp tahini",
+      "1 tbsp lemon juice"
+    ],
+    "instructions": "Cook quinoa according to package. Roast vegetables at 400F for 20 minutes. Assemble bowl with quinoa, chickpeas, and vegetables. Drizzle with tahini-lemon dressing.",
+    "kcal_total": 480,
+    "protein_g_total": 18,
+    "carbs_g_total": 68,
+    "fat_g_total": 16,
+    "dietary_tags": [
+      "vegan",
+      "vegetarian"
+    ],
+    "allergen_tags": [
+      "sesame"
+    ],
+    "prep_time_min": 35,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "dinner_001",
+    "title": "Baked Salmon with Vegetables",
+    "ingredients": [
+      "180g salmon fillet",
+      "2 cups mixed vegetables",
+      "1 tbsp olive oil",
+      "Lemon wedges",
+      "Herbs and spices"
+    ],
+    "instructions": "Preheat oven to 400F. Season salmon and vegetables with oil and spices. Bake for 15-18 minutes until salmon is cooked through. Serve with lemon.",
+    "kcal_total": 450,
+    "protein_g_total": 42,
+    "carbs_g_total": 18,
+    "fat_g_total": 22,
+    "dietary_tags": [
+      "pescatarian",
+      "omnivore"
+    ],
+    "allergen_tags": [
+      "fish"
+    ],
+    "prep_time_min": 25,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "dinner_002",
+    "title": "Vegetarian Stir-Fry",
+    "ingredients": [
+      "200g firm tofu",
+      "2 cups mixed vegetables",
+      "2 tbsp soy sauce",
+      "1 tbsp sesame oil",
+      "1 cup brown rice"
+    ],
+    "instructions": "Cook rice according to package. Press and cube tofu. Stir-fry tofu until golden, add vegetables and cook until tender. Add soy sauce and sesame oil. Serve over rice.",
+    "kcal_total": 520,
+    "protein_g_total": 24,
+    "carbs_g_total": 72,
+    "fat_g_total": 16,
+    "dietary_tags": [
+      "vegan",
+      "vegetarian"
+    ],
+    "allergen_tags": [
+      "soy",
+      "sesame"
+    ],
+    "prep_time_min": 30,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "snack_001",
+    "title": "Greek Yogurt with Nuts",
+    "ingredients": [
+      "1 cup Greek yogurt",
+      "1/4 cup mixed nuts",
+      "1 tbsp honey"
+    ],
+    "instructions": "Place yogurt in bowl, top with nuts and drizzle with honey.",
+    "kcal_total": 280,
+    "protein_g_total": 18,
+    "carbs_g_total": 24,
+    "fat_g_total": 12,
+    "dietary_tags": [
+      "vegetarian"
+    ],
+    "allergen_tags": [
+      "dairy",
+      "nuts"
+    ],
+    "prep_time_min": 2,
+    "cooking_skill": 0
+  },
+  {
+    "recipe_id": "snack_002",
+    "title": "Apple with Almond Butter",
+    "ingredients": [
+      "1 medium apple",
+      "2 tbsp almond butter"
+    ],
+    "instructions": "Slice apple and serve with almond butter for dipping.",
+    "kcal_total": 220,
+    "protein_g_total": 6,
+    "carbs_g_total": 28,
+    "fat_g_total": 10,
+    "dietary_tags": [
+      "vegan",
+      "vegetarian"
+    ],
+    "allergen_tags": [
+      "nuts"
+    ],
+    "prep_time_min": 3,
+    "cooking_skill": 0
+  },
+  {
+    "recipe_id": "breakfast_003",
+    "title": "Avocado Toast with Poached Egg",
+    "ingredients": [
+      "2 slices whole grain bread",
+      "1 ripe avocado",
+      "2 eggs",
+      "Cherry tomatoes",
+      "Salt, pepper, red pepper flakes"
+    ],
+    "instructions": "Toast bread. Mash avocado with salt and pepper. Poach eggs in simmering water for 3-4 minutes. Spread avocado on toast, top with poached egg and tomatoes.",
+    "kcal_total": 420,
+    "protein_g_total": 18,
+    "carbs_g_total": 35,
+    "fat_g_total": 24,
+    "dietary_tags": [
+      "vegetarian"
+    ],
+    "allergen_tags": [
+      "eggs",
+      "gluten"
+    ],
+    "prep_time_min": 12,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "breakfast_004",
+    "title": "Protein Pancakes",
+    "ingredients": [
+      "2 eggs",
+      "1 banana",
+      "1/4 cup oats",
+      "1 scoop protein powder",
+      "Berries for topping"
+    ],
+    "instructions": "Blend eggs, banana, oats, and protein powder. Cook small pancakes on griddle 2-3 minutes per side. Top with berries.",
+    "kcal_total": 380,
+    "protein_g_total": 32,
+    "carbs_g_total": 42,
+    "fat_g_total": 10,
+    "dietary_tags": [
+      "vegetarian",
+      "high-protein"
+    ],
+    "allergen_tags": [
+      "eggs"
+    ],
+    "prep_time_min": 15,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "breakfast_005",
+    "title": "Smoothie Bowl",
+    "ingredients": [
+      "1 frozen banana",
+      "1 cup frozen berries",
+      "1/2 cup Greek yogurt",
+      "1/4 cup granola",
+      "1 tbsp chia seeds"
+    ],
+    "instructions": "Blend banana, berries, and yogurt until thick. Pour into bowl. Top with granola and chia seeds.",
+    "kcal_total": 340,
+    "protein_g_total": 15,
+    "carbs_g_total": 58,
+    "fat_g_total": 8,
+    "dietary_tags": [
+      "vegetarian"
+    ],
+    "allergen_tags": [
+      "dairy"
+    ],
+    "prep_time_min": 5,
+    "cooking_skill": 1
+  },
+  {
+    "recipe_id": "breakfast_006",
+    "title": "Veggie Omelet",
+    "ingredients": [
+      "3 eggs",
+      "1/2 cup mixed vegetables",
+      "1/4 cup cheese",
+      "1 tbsp olive oil",
+      "Herbs"
+    ],
+    "instructions": "Beat eggs. Saut\u00c3\u00a9 vegetables in oil. Pour eggs over vegetables, add cheese. Cook until set, fold in half.",
+    "kcal_total": 390,
+    "protein_g_total": 26,
+    "carbs_g_total": 8,
+    "fat_g_total": 28,
+    "dietary_tags": [
+      "vegetarian",
+      "low-carb"
+    ],
+    "allergen_tags": [
+      "eggs",
+      "dairy"
+    ],
+    "prep_time_min": 10,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "lunch_003",
+    "title": "Turkey Wrap",
+    "ingredients": [
+      "1 whole wheat tortilla",
+      "100g sliced turkey",
+      "Lettuce",
+      "Tomato",
+      "Avocado",
+      "Mustard"
+    ],
+    "instructions": "Layer turkey, lettuce, tomato, and avocado on tortilla. Add mustard. Roll tightly and slice in half.",
+    "kcal_total": 380,
+    "protein_g_total": 28,
+    "carbs_g_total": 35,
+    "fat_g_total": 14,
+    "dietary_tags": [
+      "omnivore"
+    ],
+    "allergen_tags": [
+      "gluten"
+    ],
+    "prep_time_min": 5,
+    "cooking_skill": 1
+  },
+  {
+    "recipe_id": "lunch_004",
+    "title": "Lentil Soup",
+    "ingredients": [
+      "1 cup lentils",
+      "2 cups vegetable broth",
+      "1 carrot",
+      "1 celery stalk",
+      "1 onion",
+      "Spices"
+    ],
+    "instructions": "Saut\u00c3\u00a9 chopped vegetables. Add lentils and broth. Simmer 25-30 minutes until lentils are tender. Season to taste.",
+    "kcal_total": 320,
+    "protein_g_total": 18,
+    "carbs_g_total": 54,
+    "fat_g_total": 2,
+    "dietary_tags": [
+      "vegan",
+      "vegetarian"
+    ],
+    "allergen_tags": [],
+    "prep_time_min": 40,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "lunch_005",
+    "title": "Tuna Salad",
+    "ingredients": [
+      "1 can tuna",
+      "2 cups mixed greens",
+      "Cherry tomatoes",
+      "Cucumber",
+      "Olive oil",
+      "Lemon juice"
+    ],
+    "instructions": "Drain tuna. Combine greens, tomatoes, cucumber in bowl. Top with tuna. Drizzle with oil and lemon.",
+    "kcal_total": 280,
+    "protein_g_total": 32,
+    "carbs_g_total": 10,
+    "fat_g_total": 12,
+    "dietary_tags": [
+      "pescatarian",
+      "omnivore"
+    ],
+    "allergen_tags": [
+      "fish"
+    ],
+    "prep_time_min": 8,
+    "cooking_skill": 1
+  },
+  {
+    "recipe_id": "lunch_006",
+    "title": "Veggie Burger Bowl",
+    "ingredients": [
+      "1 veggie burger patty",
+      "1 cup quinoa",
+      "Mixed vegetables",
+      "Avocado",
+      "Tahini sauce"
+    ],
+    "instructions": "Cook quinoa. Grill veggie burger. Roast vegetables. Assemble bowl with quinoa, burger (crumbled), vegetables. Drizzle with tahini.",
+    "kcal_total": 460,
+    "protein_g_total": 20,
+    "carbs_g_total": 62,
+    "fat_g_total": 16,
+    "dietary_tags": [
+      "vegetarian",
+      "vegan"
+    ],
+    "allergen_tags": [
+      "sesame"
+    ],
+    "prep_time_min": 25,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "dinner_003",
+    "title": "Beef Stir-Fry",
+    "ingredients": [
+      "150g beef strips",
+      "2 cups mixed vegetables",
+      "2 tbsp soy sauce",
+      "1 tbsp sesame oil",
+      "Brown rice"
+    ],
+    "instructions": "Cook rice. Stir-fry beef until browned. Add vegetables, cook until tender. Add soy sauce and sesame oil. Serve over rice.",
+    "kcal_total": 520,
+    "protein_g_total": 36,
+    "carbs_g_total": 58,
+    "fat_g_total": 16,
+    "dietary_tags": [
+      "omnivore"
+    ],
+    "allergen_tags": [
+      "soy",
+      "sesame"
+    ],
+    "prep_time_min": 25,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "dinner_004",
+    "title": "Chickpea Curry",
+    "ingredients": [
+      "1 can chickpeas",
+      "1 can coconut milk",
+      "2 cups spinach",
+      "Curry spices",
+      "Brown rice"
+    ],
+    "instructions": "Cook rice. Saut\u00c3\u00a9 curry spices. Add chickpeas and coconut milk. Simmer 15 minutes. Add spinach, cook until wilted. Serve over rice.",
+    "kcal_total": 480,
+    "protein_g_total": 16,
+    "carbs_g_total": 68,
+    "fat_g_total": 18,
+    "dietary_tags": [
+      "vegan",
+      "vegetarian"
+    ],
+    "allergen_tags": [],
+    "prep_time_min": 30,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "dinner_005",
+    "title": "Grilled Shrimp Tacos",
+    "ingredients": [
+      "200g shrimp",
+      "4 small tortillas",
+      "Cabbage slaw",
+      "Avocado",
+      "Lime",
+      "Cilantro"
+    ],
+    "instructions": "Season and grill shrimp 2-3 minutes per side. Warm tortillas. Fill with shrimp, slaw, avocado. Squeeze lime and add cilantro.",
+    "kcal_total": 420,
+    "protein_g_total": 32,
+    "carbs_g_total": 42,
+    "fat_g_total": 14,
+    "dietary_tags": [
+      "pescatarian",
+      "omnivore"
+    ],
+    "allergen_tags": [
+      "shellfish",
+      "gluten"
+    ],
+    "prep_time_min": 20,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "dinner_006",
+    "title": "Pasta Primavera",
+    "ingredients": [
+      "200g whole wheat pasta",
+      "2 cups mixed vegetables",
+      "2 tbsp olive oil",
+      "Garlic",
+      "Parmesan cheese"
+    ],
+    "instructions": "Cook pasta. Saut\u00c3\u00a9 garlic and vegetables in olive oil. Toss with pasta. Top with parmesan.",
+    "kcal_total": 480,
+    "protein_g_total": 18,
+    "carbs_g_total": 72,
+    "fat_g_total": 14,
+    "dietary_tags": [
+      "vegetarian"
+    ],
+    "allergen_tags": [
+      "gluten",
+      "dairy"
+    ],
+    "prep_time_min": 20,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "snack_003",
+    "title": "Hummus with Veggies",
+    "ingredients": [
+      "1/2 cup hummus",
+      "Carrot sticks",
+      "Cucumber slices",
+      "Bell pepper strips"
+    ],
+    "instructions": "Cut vegetables into sticks. Serve with hummus for dipping.",
+    "kcal_total": 180,
+    "protein_g_total": 8,
+    "carbs_g_total": 22,
+    "fat_g_total": 8,
+    "dietary_tags": [
+      "vegan",
+      "vegetarian"
+    ],
+    "allergen_tags": [
+      "sesame"
+    ],
+    "prep_time_min": 5,
+    "cooking_skill": 0
+  },
+  {
+    "recipe_id": "snack_004",
+    "title": "Protein Shake",
+    "ingredients": [
+      "1 scoop protein powder",
+      "1 banana",
+      "1 cup almond milk",
+      "1 tbsp peanut butter",
+      "Ice"
+    ],
+    "instructions": "Blend all ingredients until smooth.",
+    "kcal_total": 320,
+    "protein_g_total": 28,
+    "carbs_g_total": 32,
+    "fat_g_total": 10,
+    "dietary_tags": [
+      "vegetarian"
+    ],
+    "allergen_tags": [
+      "nuts",
+      "dairy"
+    ],
+    "prep_time_min": 3,
+    "cooking_skill": 0
+  },
+  {
+    "recipe_id": "snack_005",
+    "title": "Trail Mix",
+    "ingredients": [
+      "1/4 cup mixed nuts",
+      "2 tbsp dried fruit",
+      "1 tbsp dark chocolate chips"
+    ],
+    "instructions": "Mix all ingredients together. Portion into small container.",
+    "kcal_total": 240,
+    "protein_g_total": 6,
+    "carbs_g_total": 26,
+    "fat_g_total": 14,
+    "dietary_tags": [
+      "vegan",
+      "vegetarian"
+    ],
+    "allergen_tags": [
+      "nuts"
+    ],
+    "prep_time_min": 2,
+    "cooking_skill": 0
+  },
+  {
+    "recipe_id": "snack_006",
+    "title": "Rice Cakes with Cottage Cheese",
+    "ingredients": [
+      "2 rice cakes",
+      "1/2 cup cottage cheese",
+      "Sliced strawberries",
+      "Honey drizzle"
+    ],
+    "instructions": "Spread cottage cheese on rice cakes. Top with strawberries and drizzle with honey.",
+    "kcal_total": 200,
+    "protein_g_total": 14,
+    "carbs_g_total": 28,
+    "fat_g_total": 4,
+    "dietary_tags": [
+      "vegetarian"
+    ],
+    "allergen_tags": [
+      "dairy"
+    ],
+    "prep_time_min": 3,
+    "cooking_skill": 0
+  }
+]

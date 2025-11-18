@@ -1,0 +1,324 @@
+# Implementation Plan
+
+- [x] 1. Set up project structure and core configuration
+  - Create directory structure: `src/` with subdirectories `api/`, `core/`, `models/`, `services/`, `utils/`, `data/`
+  - Initialize FastAPI application with CORS middleware and error handlers
+  - Create configuration management for environment variables (MODEL_NAME, EMBEDDING_MODEL, VECTOR_DB_TYPE, DATABASE_URL, API_PORT)
+  - Set up logging configuration with appropriate log levels
+  - Create Pydantic models for UserProfile, NutritionTargets, RecipeCandidate, MealPlan schemas
+  - _Requirements: 1.1, 1.2, 7.5, 10.2_
+
+- [x] 2. Implement deterministic nutrition engine
+  - [x] 2.1 Create NutritionEngine class with BMR calculation using Mifflin-St Jeor formula
+    - Implement `calculate_bmr(age, sex, weight_kg, height_cm)` method
+    - Handle sex constants: male=5, female=-161, other=-78
+    - _Requirements: 2.1_
+  - [x] 2.2 Implement TDEE calculation with activity multipliers
+    - Create activity level mapping (sedentary=1.2, light=1.375, moderate=1.55, active=1.725, very_active=1.9)
+    - Implement `calculate_tdee(bmr, activity_level)` method
+    - _Requirements: 2.2_
+  - [x] 2.3 Implement target calorie calculation with goal adjustments
+    - Calculate caloric adjustment: `goal_rate_kg_per_week * 7700 / 7`
+    - Apply safety floor: `max(target_kcal, 1200)`
+    - _Requirements: 2.3, 2.4_
+  - [x] 2.4 Implement macro distribution calculations
+    - Calculate protein: `max(1.6 * weight_kg, 0.20 * target_kcal / 4)`
+    - Calculate fat: `0.25 * target_kcal / 9`
+    - Calculate carbs: `(target_kcal - protein*4 - fat*9) / 4`
+    - _Requirements: 2.5, 2.6, 2.7_
+  - [x] 2.5 Implement meal split distribution
+    - Create configurable meal split ratios (default: breakfast=0.25, lunch=0.35, dinner=0.30, snacks=0.10)
+    - Calculate per-meal calorie and macro targets
+    - _Requirements: 2.8_
+  - [ ]* 2.6 Write unit tests for nutrition calculations
+    - Test BMR calculation accuracy with known values
+    - Test edge cases (minimum calorie floor, extreme goal rates)
+    - Verify macro calculations sum correctly
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8_
+
+- [x] 3. Build recipe embedding and indexing pipeline
+  - [x] 3.1 Create recipe data preprocessing module
+    - Implement recipe text cleaning and normalization
+    - Validate nutrition data completeness (kcal_total, protein_g_total, carbs_g_total, fat_g_total)
+    - Normalize dietary and allergen tags to standard vocabulary
+    - _Requirements: 8.1, 8.4_
+  - [x] 3.2 Implement embedding generation service
+    - Load sentence-transformers model (all-MiniLM-L6-v2 or all-mpnet-base-v2)
+    - Create `generate_embedding(text)` method for recipe title + ingredients
+    - Batch process recipes for efficiency
+    - _Requirements: 3.8, 8.2_
+  - [x] 3.3 Set up vector database integration
+    - Implement FAISS index creation with appropriate dimension (384 or 768)
+    - Create Chroma collection as alternative option
+    - Implement `add_recipe(recipe_doc)` method with metadata storage
+    - Implement `search(query_embedding, top_k, filters)` method
+    - _Requirements: 3.1, 8.3_
+  - [x] 3.4 Create recipe indexing script
+    - Load recipes from JSON/CSV source files
+    - Process and validate each recipe
+    - Generate embeddings and index in vector database
+    - Log indexing statistics and errors
+    - _Requirements: 8.1, 8.2, 8.3, 8.5_
+
+- [x] 4. Implement RAG retrieval module with hybrid scoring
+  - [x] 4.1 Create RAGModule class with initialization
+    - Load embedding model and vector database connection
+    - Initialize query embedding cache
+    - _Requirements: 3.1, 3.8_
+  - [x] 4.2 Implement allergen filtering
+    - Filter out recipes containing user allergens before scoring
+    - _Requirements: 3.7_
+  - [x] 4.3 Implement hybrid scoring algorithm
+    - Calculate semantic similarity: `(cosine_similarity + 1) / 2` normalized to [0,1]
+    - Calculate kcal_proximity_score: `max(0, 1 - abs(recipe_kcal - target_kcal) / target_kcal)`
+    - Calculate tag_score: `(matching_tags / required_tags)` clipped to [0,1]
+    - Compute final_score: `0.6*s_sem + 0.3*kcal_prox + 0.1*tag_score`
+    - _Requirements: 3.2, 3.3, 3.4, 3.5_
+  - [x] 4.4 Implement candidate retrieval method
+    - Generate query embedding from meal type and dietary preferences
+    - Retrieve top-K candidates (K=3) from vector database
+    - Apply hybrid scoring and rank results
+    - Return RecipeCandidate objects with scores
+    - _Requirements: 3.6_
+  - [ ]* 4.5 Write unit tests for scoring algorithm
+    - Test semantic similarity calculation
+    - Test kcal proximity with various differences
+    - Test tag matching logic
+    - Verify final score weighting
+    - _Requirements: 3.2, 3.3, 3.4, 3.5_
+
+- [x] 5. Build LLM orchestration layer with phi2 integration
+  - [x] 5.1 Create LLMOrchestrator class
+    - Load phi2 model (microsoft/phi-2) using HuggingFace Transformers
+    - Load tokenizer with appropriate padding and truncation settings
+    - Configure generation parameters: temperature=0.1, max_new_tokens=800
+    - _Requirements: 4.2_
+  - [x] 5.2 Implement prompt template construction
+    - Create SYSTEM_MESSAGE with strict numeric provenance rules
+    - Create USER_MESSAGE template with user profile, nutrition targets, and retrieved recipes
+    - Create ASSISTANT_SCHEMA template with JSON output format
+    - Format cursor-style message array
+    - _Requirements: 4.1, 4.3_
+  - [x] 5.3 Implement LLM inference method
+    - Tokenize cursor messages
+    - Call phi2 model with configured parameters
+    - Decode output and extract JSON
+    - Handle generation errors and timeouts
+    - _Requirements: 4.2_
+  - [x] 5.4 Implement JSON schema enforcement
+    - Parse LLM output as JSON
+    - Validate against MealPlan schema
+    - Handle malformed JSON with retry logic (max 2 attempts)
+    - _Requirements: 4.4_
+  - [x] 5.5 Handle missing nutrition data cases
+    - Detect recipes with incomplete nutrition in retrieved candidates
+    - Instruct LLM to mark meals as "MISSING_NUTRITION"
+    - Ensure no numeric values filled for missing data
+    - _Requirements: 4.5, 4.6_
+
+- [x] 6. Implement post-processing validator for safety enforcement
+  - [x] 6.1 Create Validator class with provenance checking
+    - Extract all numeric nutrition values from LLM output
+    - Build provenance map from input context (deterministic targets + retrieved recipes)
+    - Verify each numeric value exists in provenance map
+    - _Requirements: 5.1, 5.2_
+  - [x] 6.2 Implement schema validation
+    - Validate JSON structure matches MealPlan schema
+    - Check required fields presence (plan_id, user_id, date, meals, total_nutrition)
+    - Validate data types and value ranges
+    - _Requirements: 4.4_
+  - [x] 6.3 Implement safety constraint checks
+    - Verify total daily calories >= 1200
+    - Check meal nutrition sums match total_nutrition within tolerance
+    - Validate nutrition_provenance and sources fields
+    - _Requirements: 5.3, 5.4, 5.6_
+  - [x] 6.4 Implement error handling and logging
+    - Log validation failures with specific violation details
+    - Return structured error responses
+    - Track validation failure metrics
+    - _Requirements: 5.3, 10.5_
+  - [ ]* 6.5 Write unit tests for validator
+    - Test provenance violation detection
+    - Test schema validation with invalid inputs
+    - Test safety constraint enforcement
+    - _Requirements: 5.1, 5.2, 5.3_
+
+- [x] 7. Create FastAPI endpoints and request handlers
+  - [x] 7.1 Implement POST /generate-plan endpoint
+    - Define GeneratePlanRequest and GeneratePlanResponse schemas
+    - Validate user profile input
+    - Call DeterministicEngine to calculate nutrition targets
+    - Call RAGModule to retrieve candidates for each meal
+    - Call LLMOrchestrator to generate meal plan
+    - Call Validator to verify output
+    - Return validated meal plan or error response
+    - _Requirements: 1.1, 1.2, 1.3, 7.1, 7.5_
+  - [x] 7.2 Implement POST /swap endpoint
+    - Define SwapRequest schema with plan_id, meal_type, optional constraints
+    - Retrieve original meal plan from database
+    - Call RAGModule with updated constraints for alternative candidates
+    - Construct swap-specific prompt template
+    - Call LLMOrchestrator to generate swapped meal
+    - Update meal plan and add swap_history metadata
+    - Validate updated plan maintains daily nutrition targets within 10% tolerance
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 7.2_
+  - [x] 7.3 Implement GET /recipes/{recipe_id} endpoint
+    - Query vector database for recipe by recipe_id
+    - Return complete recipe details with nutrition data
+    - Handle recipe not found with 404 response
+    - _Requirements: 7.3_
+  - [x] 7.4 Implement POST /estimate-nutrition endpoint (opt-in)
+    - Define EstimateNutritionRequest and EstimateNutritionResponse schemas
+    - Query foods database for ingredient-level nutrition
+    - Compose total nutrition from ingredients
+    - Mark result with nutrition_status="ESTIMATED"
+    - _Requirements: 5.5, 7.4_
+  - [x] 7.5 Implement GET /health endpoint
+    - Check database connectivity
+    - Check vector database availability
+    - Check model loading status
+    - Return service health status
+    - _Requirements: 10.4_
+  - [x] 7.6 Add OpenAPI documentation
+    - Configure FastAPI to generate OpenAPI schema
+    - Add endpoint descriptions and examples
+    - Make documentation available at /docs
+    - _Requirements: 7.7_
+  - [ ]* 7.7 Write integration tests for API endpoints
+    - Test /generate-plan with valid and invalid inputs
+    - Test /swap with various constraints
+    - Test error responses and status codes
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
+
+- [x] 8. Set up database models and persistence layer
+  - [x] 8.1 Create PostgreSQL database schema
+    - Define user_profiles table with all profile fields
+    - Define meal_plans table with plan data and timestamps
+    - Define swap_history table for tracking meal swaps
+    - Create indexes on user_id, plan_id, date fields
+    - _Requirements: 1.4, 10.1_
+  - [x] 8.2 Implement database connection and session management
+    - Configure SQLAlchemy engine with connection pooling
+    - Create session factory for request-scoped sessions
+    - Implement connection health checks
+    - _Requirements: 10.1, 10.4_
+  - [x] 8.3 Create ORM models
+    - Implement UserProfile model with validation
+    - Implement MealPlan model with JSON fields for plan data
+    - Implement SwapHistory model with foreign keys
+    - _Requirements: 1.4_
+  - [x] 8.4 Implement repository pattern for data access
+    - Create UserProfileRepository with CRUD operations
+    - Create MealPlanRepository with query methods
+    - Create SwapHistoryRepository for tracking swaps
+    - _Requirements: 1.4, 6.5_
+
+- [x] 9. Build frontend user interface
+  - [x] 9.1 Create onboarding form component
+    - Implement form fields for all user profile inputs with appropriate types
+    - Add client-side validation for required fields and ranges
+    - Implement dietary preference and allergen multi-select
+    - Add schedule time pickers for wake/lunch/dinner times
+    - Style form with responsive layout
+    - _Requirements: 9.1_
+  - [x] 9.2 Implement meal plan generation flow
+    - Add submit button that calls POST /generate-plan
+    - Display loading state with estimated wait time
+    - Handle API errors with user-friendly messages
+    - _Requirements: 9.5_
+  - [x] 9.3 Create meal plan display component
+    - Display each meal with recipe title, ingredients, instructions, portion size
+    - Show nutrition breakdown per meal (kcal, protein, carbs, fat)
+    - Display total daily nutrition summary
+    - Add progress indicators comparing actual to target values
+    - _Requirements: 9.2, 9.4_
+  - [x] 9.4 Implement meal swap functionality
+    - Add swap button for each meal
+    - Create swap modal with optional constraint checkboxes
+    - Call POST /swap endpoint and update plan display
+    - Show swap history indicator
+    - _Requirements: 9.3_
+  - [x] 9.5 Add API client service
+    - Create axios/fetch wrapper for API calls
+    - Implement request/response interceptors
+    - Handle authentication headers (if needed)
+    - _Requirements: 7.1, 7.2, 7.3_
+
+- [x] 10. Create deployment configuration and documentation
+  - [x] 10.1 Create docker-compose.yml for local development
+    - Define FastAPI service container with volume mounts
+    - Define PostgreSQL container with initialization scripts
+    - Define vector database container (FAISS in-memory or Chroma)
+    - Configure networking and port mappings
+    - _Requirements: 10.1_
+  - [x] 10.2 Create Dockerfile for FastAPI service
+    - Use Python 3.10+ base image
+    - Install dependencies from requirements.txt
+    - Copy application code
+    - Set up model download on build or startup
+    - Configure entrypoint for uvicorn server
+    - _Requirements: 10.1_
+  - [x] 10.3 Create environment configuration template
+    - Document all required environment variables
+    - Provide .env.example with default values
+    - Add validation for required variables on startup
+    - _Requirements: 10.2_
+  - [x] 10.4 Write README with setup instructions
+    - Add prerequisites (Docker, Python, Git)
+    - Document step-by-step local setup: clone, configure env, build containers, run migrations
+    - Add recipe indexing instructions
+    - Document how to start services and access frontend
+    - Include example API calls with curl
+    - Add troubleshooting section
+    - _Requirements: 10.3_
+  - [x] 10.5 Create database initialization scripts
+    - Write SQL migration for initial schema
+    - Create seed data script for sample recipes
+    - Add script to run embedding generation and indexing
+    - _Requirements: 10.3_
+  - [ ]* 10.6 Add monitoring and logging configuration
+    - Configure structured logging with JSON format
+    - Add request/response logging middleware
+    - Set up error tracking and alerting hooks
+    - _Requirements: 10.5_
+
+- [x] 11. Implement example data and testing utilities
+  - [x] 11.1 Create sample recipe dataset
+    - Compile 50-100 recipes with complete nutrition data
+    - Cover various dietary preferences (vegan, vegetarian, omnivore)
+    - Include diverse cuisines and meal types
+    - Format as JSON with all required fields
+    - _Requirements: 3.1, 8.1_
+  - [x] 11.2 Create sample user profiles for testing
+    - Define 5-10 test user profiles covering different demographics and goals
+    - Include edge cases (very low/high BMI, extreme goals)
+    - _Requirements: 1.1_
+  - [ ]* 11.3 Create end-to-end test script
+    - Script that generates plans for all test user profiles
+    - Validates output structure and nutrition provenance
+    - Measures generation time and success rate
+    - _Requirements: 5.1, 5.2, 5.3_
+
+- [x] 12. Wire everything together and perform integration
+  - [x] 12.1 Create main application factory
+    - Initialize all services (DeterministicEngine, RAGModule, LLMOrchestrator, Validator)
+    - Register API routes
+    - Configure middleware and error handlers
+    - Set up startup and shutdown events
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
+  - [x] 12.2 Implement dependency injection
+    - Create FastAPI dependencies for database sessions
+    - Create dependencies for service instances
+    - Ensure proper resource cleanup
+    - _Requirements: 7.1_
+  - [x] 12.3 Add error handling and logging throughout
+    - Implement global exception handler
+    - Add request ID tracking for debugging
+    - Log all validation failures and errors
+    - _Requirements: 7.5, 7.6, 10.5_
+  - [x] 12.4 Perform end-to-end integration testing
+    - Test complete flow from user input to meal plan generation
+    - Test swap functionality with various constraints
+    - Verify nutrition provenance in all outputs
+    - Test error scenarios and edge cases
+    - _Requirements: 5.1, 5.2, 5.3, 6.1, 6.2, 6.3, 6.4_

@@ -1,0 +1,162 @@
+[
+  {
+    "name": "Active Male - Weight Loss",
+    "profile": {
+      "user_id": "test_user_001",
+      "age": 30,
+      "sex": "male",
+      "weight_kg": 90,
+      "height_cm": 180,
+      "activity_level": "active",
+      "goal": "lose",
+      "goal_rate_kg_per_week": -0.5,
+      "diet_pref": "omnivore",
+      "allergies": [],
+      "wake_time": "06:00:00",
+      "lunch_time": "12:00:00",
+      "dinner_time": "19:00:00",
+      "cooking_skill": 3,
+      "budget_per_week": null
+    }
+  },
+  {
+    "name": "Sedentary Female - Weight Gain",
+    "profile": {
+      "user_id": "test_user_002",
+      "age": 25,
+      "sex": "female",
+      "weight_kg": 50,
+      "height_cm": 165,
+      "activity_level": "sedentary",
+      "goal": "gain",
+      "goal_rate_kg_per_week": 0.3,
+      "diet_pref": "vegetarian",
+      "allergies": ["nuts"],
+      "wake_time": "08:00:00",
+      "lunch_time": "13:00:00",
+      "dinner_time": "20:00:00",
+      "cooking_skill": 2,
+      "budget_per_week": null
+    }
+  },
+  {
+    "name": "Moderate Male - Maintenance",
+    "profile": {
+      "user_id": "test_user_003",
+      "age": 40,
+      "sex": "male",
+      "weight_kg": 75,
+      "height_cm": 175,
+      "activity_level": "moderate",
+      "goal": "maintain",
+      "goal_rate_kg_per_week": 0,
+      "diet_pref": "pescatarian",
+      "allergies": ["dairy"],
+      "wake_time": "07:00:00",
+      "lunch_time": "12:30:00",
+      "dinner_time": "18:30:00",
+      "cooking_skill": 4,
+      "budget_per_week": null
+    }
+  },
+  {
+    "name": "Very Active Female - Weight Loss",
+    "profile": {
+      "user_id": "test_user_004",
+      "age": 28,
+      "sex": "female",
+      "weight_kg": 70,
+      "height_cm": 170,
+      "activity_level": "very_active",
+      "goal": "lose",
+      "goal_rate_kg_per_week": -0.7,
+      "diet_pref": "vegan",
+      "allergies": ["soy"],
+      "wake_time": "05:30:00",
+      "lunch_time": "12:00:00",
+      "dinner_time": "19:00:00",
+      "cooking_skill": 5,
+      "budget_per_week": null
+    }
+  },
+  {
+    "name": "Light Activity Male - Weight Gain",
+    "profile": {
+      "user_id": "test_user_005",
+      "age": 22,
+      "sex": "male",
+      "weight_kg": 60,
+      "height_cm": 178,
+      "activity_level": "light",
+      "goal": "gain",
+      "goal_rate_kg_per_week": 0.5,
+      "diet_pref": "omnivore",
+      "allergies": ["shellfish", "eggs"],
+      "wake_time": "07:30:00",
+      "lunch_time": "13:00:00",
+      "dinner_time": "20:00:00",
+      "cooking_skill": 1,
+      "budget_per_week": null
+    }
+  },
+  {
+    "name": "Edge Case - Very Low BMI",
+    "profile": {
+      "user_id": "test_user_006",
+      "age": 20,
+      "sex": "female",
+      "weight_kg": 45,
+      "height_cm": 160,
+      "activity_level": "sedentary",
+      "goal": "gain",
+      "goal_rate_kg_per_week": 0.4,
+      "diet_pref": "ovo-lacto",
+      "allergies": [],
+      "wake_time": "08:00:00",
+      "lunch_time": "12:00:00",
+      "dinner_time": "19:00:00",
+      "cooking_skill": 2,
+      "budget_per_week": null
+    }
+  },
+  {
+    "name": "Edge Case - High BMI",
+    "profile": {
+      "user_id": "test_user_007",
+      "age": 45,
+      "sex": "male",
+      "weight_kg": 120,
+      "height_cm": 175,
+      "activity_level": "light",
+      "goal": "lose",
+      "goal_rate_kg_per_week": -1.0,
+      "diet_pref": "omnivore",
+      "allergies": ["gluten"],
+      "wake_time": "06:30:00",
+      "lunch_time": "12:00:00",
+      "dinner_time": "18:00:00",
+      "cooking_skill": 3,
+      "budget_per_week": null
+    }
+  },
+  {
+    "name": "Senior - Maintenance",
+    "profile": {
+      "user_id": "test_user_008",
+      "age": 65,
+      "sex": "female",
+      "weight_kg": 65,
+      "height_cm": 162,
+      "activity_level": "light",
+      "goal": "maintain",
+      "goal_rate_kg_per_week": 0,
+      "diet_pref": "pescatarian",
+      "allergies": ["nuts", "dairy"],
+      "wake_time": "06:00:00",
+      "lunch_time": "11:30:00",
+      "dinner_time": "17:30:00",
+      "cooking_skill": 4,
+      "budget_per_week": null
+    }
+  }
+]

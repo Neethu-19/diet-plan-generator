@@ -1,0 +1,771 @@
+[
+  {
+    "recipe_id": "breakfast_001",
+    "title": "Classic Oatmeal with Berries",
+    "ingredients": [
+      "1 cup rolled oats",
+      "2 cups water",
+      "1/2 cup fresh blueberries",
+      "1 tbsp honey",
+      "1/4 tsp cinnamon"
+    ],
+    "instructions": "Bring water to boil, add oats and reduce heat. Simmer for 5 minutes stirring occasionally. Top with berries, honey, and cinnamon.",
+    "detailed_instructions": [
+      {
+        "step": 1,
+        "action": "Prepare ingredients",
+        "description": "Measure out 1 cup of rolled oats and 2 cups of water. Rinse fresh blueberries.",
+        "time": "1 minute",
+        "tip": "Use old-fashioned rolled oats for best texture, not instant oats"
+      },
+      {
+        "step": 2,
+        "action": "Boil water",
+        "description": "Pour 2 cups of water into a medium saucepan and bring to a rolling boil over high heat.",
+        "time": "3-4 minutes",
+        "tip": "Adding a pinch of salt enhances the flavor"
+      },
+      {
+        "step": 3,
+        "action": "Add oats",
+        "description": "Once water is boiling, add the oats and stir well. Reduce heat to medium-low.",
+        "time": "30 seconds",
+        "tip": "Stir immediately to prevent clumping"
+      },
+      {
+        "step": 4,
+        "action": "Simmer",
+        "description": "Let the oats simmer gently, stirring occasionally, until they absorb the water and reach desired consistency.",
+        "time": "5 minutes",
+        "tip": "For creamier oats, add more water and cook longer"
+      },
+      {
+        "step": 5,
+        "action": "Add toppings",
+        "description": "Transfer oatmeal to bowl. Top with fresh blueberries, drizzle with honey, and sprinkle with cinnamon.",
+        "time": "1 minute",
+        "tip": "Let oatmeal cool for 1-2 minutes before adding honey to preserve its beneficial enzymes"
+      }
+    ],
+    "ingredient_benefits": {
+      "rolled_oats": {
+        "benefits": ["High in fiber (beta-glucan)", "Lowers cholesterol", "Stabilizes blood sugar", "Promotes gut health", "Provides sustained energy"],
+        "nutrients": "Rich in manganese, phosphorus, magnesium, iron, and B vitamins",
+        "why_good": "Whole grain that keeps you full longer and supports heart health"
+      },
+      "blueberries": {
+        "benefits": ["Powerful antioxidants", "Improves brain function", "Supports heart health", "Anti-inflammatory", "May improve memory"],
+        "nutrients": "High in vitamin C, vitamin K, and manganese",
+        "why_good": "One of the most antioxidant-rich foods, protects cells from damage"
+      },
+      "honey": {
+        "benefits": ["Natural sweetener", "Contains antioxidants", "Antibacterial properties", "Soothes throat", "Better than refined sugar"],
+        "nutrients": "Contains trace amounts of vitamins and minerals",
+        "why_good": "Provides quick energy with some beneficial compounds, unlike white sugar"
+      },
+      "cinnamon": {
+        "benefits": ["Regulates blood sugar", "Anti-inflammatory", "Rich in antioxidants", "May improve insulin sensitivity", "Antimicrobial"],
+        "nutrients": "Good source of manganese and calcium",
+        "why_good": "Helps control blood sugar spikes after meals"
+      }
+    },
+    "what_to_avoid": [
+      "Instant oats with added sugar - they spike blood sugar",
+      "Artificial sweeteners - use natural honey instead",
+      "Excessive honey - stick to 1 tbsp to control sugar intake",
+      "Microwaving in plastic containers - use glass or ceramic"
+    ],
+    "health_notes": {
+      "best_for": ["Weight management", "Heart health", "Diabetes management", "Digestive health"],
+      "timing": "Ideal for breakfast - provides sustained energy for 3-4 hours",
+      "modifications": {
+        "higher_protein": "Add 1 scoop protein powder or 2 tbsp nut butter",
+        "lower_carb": "Use 1/2 cup oats and add more nuts/seeds",
+        "vegan": "Already vegan! Replace honey with maple syrup if needed"
+      }
+    },
+    "kcal_total": 320,
+    "protein_g_total": 10,
+    "carbs_g_total": 62,
+    "fat_g_total": 5,
+    "dietary_tags": ["vegan", "vegetarian"],
+    "allergen_tags": [],
+    "prep_time_min": 10,
+    "cooking_skill": 1
+  },
+  {
+    "recipe_id": "breakfast_002",
+    "title": "Scrambled Eggs with Toast",
+    "ingredients": [
+      "3 large eggs",
+      "2 slices whole wheat bread",
+      "1 tbsp butter",
+      "Salt and pepper to taste"
+    ],
+    "instructions": "Beat eggs with salt and pepper. Melt butter in pan, add eggs and scramble until cooked. Toast bread and serve together.",
+    "detailed_instructions": [
+      {
+        "step": 1,
+        "action": "Prepare eggs",
+        "description": "Crack 3 eggs into a bowl. Add a pinch of salt and pepper. Whisk vigorously with a fork until yolks and whites are fully combined and slightly frothy.",
+        "time": "1 minute",
+        "tip": "Whisking air into eggs makes them fluffier"
+      },
+      {
+        "step": 2,
+        "action": "Heat pan",
+        "description": "Place a non-stick pan over medium-low heat. Add 1 tbsp butter and let it melt completely, swirling to coat the pan.",
+        "time": "1 minute",
+        "tip": "Medium-low heat is key - high heat makes eggs rubbery"
+      },
+      {
+        "step": 3,
+        "action": "Cook eggs",
+        "description": "Pour beaten eggs into the pan. Let sit for 20 seconds, then gently push eggs from edges to center with a spatula. Continue until eggs are mostly set but still slightly wet.",
+        "time": "3-4 minutes",
+        "tip": "Remove from heat when eggs are still slightly wet - they'll continue cooking"
+      },
+      {
+        "step": 4,
+        "action": "Toast bread",
+        "description": "While eggs cook, toast whole wheat bread slices until golden brown.",
+        "time": "2-3 minutes",
+        "tip": "Toast bread at the same time as cooking eggs to serve everything hot"
+      },
+      {
+        "step": 5,
+        "action": "Serve",
+        "description": "Transfer scrambled eggs to plate immediately. Serve with toasted bread.",
+        "time": "30 seconds",
+        "tip": "Serve immediately for best texture and temperature"
+      }
+    ],
+    "ingredient_benefits": {
+      "eggs": {
+        "benefits": ["Complete protein source", "Rich in choline for brain health", "Contains all essential amino acids", "Supports muscle building", "Improves eye health (lutein & zeaxanthin)"],
+        "nutrients": "High in protein, vitamin B12, vitamin D, selenium, and healthy fats",
+        "why_good": "One of the most nutritious foods - the yolk contains most vitamins and minerals"
+      },
+      "whole_wheat_bread": {
+        "benefits": ["High in fiber", "Provides complex carbohydrates", "Contains B vitamins", "Supports digestive health", "More nutrients than white bread"],
+        "nutrients": "Good source of fiber, iron, magnesium, and B vitamins",
+        "why_good": "Whole grains provide sustained energy and keep you full longer"
+      },
+      "butter": {
+        "benefits": ["Contains vitamin A", "Provides fat-soluble vitamins", "Natural source of CLA", "Better than margarine", "Adds flavor and satiety"],
+        "nutrients": "Rich in vitamin A, vitamin E, and vitamin K2",
+        "why_good": "Natural fat that helps absorb fat-soluble vitamins from eggs"
+      }
+    },
+    "what_to_avoid": [
+      "Overcooking eggs - makes them dry and rubbery",
+      "High heat - causes eggs to become tough",
+      "White bread - lacks fiber and nutrients",
+      "Margarine - contains trans fats, use real butter",
+      "Adding milk - makes eggs watery (optional, but not recommended)"
+    ],
+    "health_notes": {
+      "best_for": ["Muscle building", "Weight management", "Brain health", "Post-workout meal"],
+      "timing": "Perfect breakfast - high protein keeps you full until lunch",
+      "modifications": {
+        "higher_protein": "Add 1-2 more eggs or serve with turkey sausage",
+        "lower_fat": "Use 2 whole eggs + 2 egg whites, reduce butter to 1 tsp",
+        "add_veggies": "Mix in spinach, tomatoes, or mushrooms for extra nutrients"
+      }
+    },
+    "kcal_total": 380,
+    "protein_g_total": 22,
+    "carbs_g_total": 28,
+    "fat_g_total": 18,
+    "dietary_tags": ["vegetarian", "ovo-lacto"],
+    "allergen_tags": ["eggs", "wheat", "gluten", "dairy"],
+    "prep_time_min": 8,
+    "cooking_skill": 1
+  },
+  {
+    "recipe_id": "lunch_001",
+    "title": "Grilled Chicken Salad",
+    "ingredients": [
+      "150g grilled chicken breast",
+      "2 cups mixed greens",
+      "1/2 cup cherry tomatoes",
+      "1/4 cup cucumber",
+      "2 tbsp olive oil",
+      "1 tbsp balsamic vinegar"
+    ],
+    "instructions": "Grill chicken breast and slice. Toss greens, tomatoes, and cucumber. Top with chicken and drizzle with oil and vinegar.",
+    "detailed_instructions": [
+      {
+        "step": 1,
+        "action": "Prepare chicken",
+        "description": "Pat chicken breast dry with paper towels. Season both sides with salt, pepper, and optional herbs (garlic powder, paprika).",
+        "time": "2 minutes",
+        "tip": "Dry chicken browns better and gets nice grill marks"
+      },
+      {
+        "step": 2,
+        "action": "Grill chicken",
+        "description": "Preheat grill or grill pan to medium-high heat. Brush with oil. Grill chicken for 6-7 minutes per side until internal temperature reaches 165°F (74°C).",
+        "time": "14-15 minutes",
+        "tip": "Don't flip too early - let it develop grill marks first"
+      },
+      {
+        "step": 3,
+        "action": "Rest chicken",
+        "description": "Remove chicken from grill and let rest for 5 minutes before slicing. This keeps it juicy.",
+        "time": "5 minutes",
+        "tip": "Resting allows juices to redistribute throughout the meat"
+      },
+      {
+        "step": 4,
+        "action": "Prepare vegetables",
+        "description": "While chicken rests, wash and dry mixed greens. Halve cherry tomatoes. Slice cucumber into thin rounds.",
+        "time": "3 minutes",
+        "tip": "Dry greens well so dressing adheres properly"
+      },
+      {
+        "step": 5,
+        "action": "Make dressing",
+        "description": "In a small bowl, whisk together olive oil and balsamic vinegar. Add a pinch of salt and pepper.",
+        "time": "1 minute",
+        "tip": "Ratio is 2:1 oil to vinegar for balanced flavor"
+      },
+      {
+        "step": 6,
+        "action": "Assemble salad",
+        "description": "Place greens in a large bowl. Add tomatoes and cucumber. Slice chicken and arrange on top. Drizzle with dressing.",
+        "time": "2 minutes",
+        "tip": "Dress salad just before eating to keep greens crisp"
+      }
+    ],
+    "ingredient_benefits": {
+      "chicken_breast": {
+        "benefits": ["Lean protein source", "Builds and repairs muscle", "Low in fat", "Rich in B vitamins", "Supports immune function"],
+        "nutrients": "High in protein, niacin, vitamin B6, phosphorus, and selenium",
+        "why_good": "One of the leanest protein sources - perfect for muscle building and weight loss"
+      },
+      "mixed_greens": {
+        "benefits": ["Low in calories", "High in vitamins A, C, K", "Rich in antioxidants", "Supports bone health", "Promotes healthy skin"],
+        "nutrients": "Excellent source of folate, iron, calcium, and fiber",
+        "why_good": "Nutrient-dense with minimal calories - great for weight management"
+      },
+      "cherry_tomatoes": {
+        "benefits": ["Rich in lycopene (antioxidant)", "Supports heart health", "May reduce cancer risk", "Good for skin", "Anti-inflammatory"],
+        "nutrients": "High in vitamin C, potassium, and vitamin K",
+        "why_good": "Lycopene is more bioavailable when tomatoes are cooked or paired with fat (olive oil)"
+      },
+      "cucumber": {
+        "benefits": ["Hydrating (96% water)", "Low in calories", "Contains antioxidants", "Supports hydration", "Aids digestion"],
+        "nutrients": "Good source of vitamin K and potassium",
+        "why_good": "Adds crunch and hydration with almost no calories"
+      },
+      "olive_oil": {
+        "benefits": ["Heart-healthy monounsaturated fats", "Anti-inflammatory", "Rich in antioxidants", "May lower cholesterol", "Supports brain health"],
+        "nutrients": "High in vitamin E and polyphenols",
+        "why_good": "One of the healthiest fats - cornerstone of Mediterranean diet"
+      },
+      "balsamic_vinegar": {
+        "benefits": ["May improve digestion", "Contains antioxidants", "May help regulate blood sugar", "Low in calories", "Adds flavor without fat"],
+        "nutrients": "Contains small amounts of calcium, iron, and potassium",
+        "why_good": "Adds tangy flavor with minimal calories and some health benefits"
+      }
+    },
+    "what_to_avoid": [
+      "Overcooking chicken - makes it dry (use meat thermometer)",
+      "Store-bought dressings - often high in sugar and preservatives",
+      "Iceberg lettuce - has minimal nutrients compared to mixed greens",
+      "Too much dressing - drowns the salad and adds excess calories",
+      "Grilling on too high heat - burns outside while inside stays raw"
+    ],
+    "health_notes": {
+      "best_for": ["Weight loss", "Muscle building", "Heart health", "Post-workout meal", "Low-carb diets"],
+      "timing": "Perfect for lunch - high protein keeps you satisfied without afternoon crash",
+      "modifications": {
+        "higher_carbs": "Add quinoa, chickpeas, or sweet potato",
+        "more_filling": "Add avocado, nuts, or seeds",
+        "different_protein": "Substitute with salmon, tofu, or shrimp",
+        "meal_prep": "Grill multiple chicken breasts and store for 3-4 days"
+      }
+    },
+    "kcal_total": 420,
+    "protein_g_total": 38,
+    "carbs_g_total": 12,
+    "fat_g_total": 24,
+    "dietary_tags": ["omnivore", "high-protein", "low-carb"],
+    "allergen_tags": [],
+    "prep_time_min": 20,
+    "cooking_skill": 2
+  }
+]
+,
+  {
+    "recipe_id": "lunch_002",
+    "title": "Quinoa Buddha Bowl",
+    "ingredients": [
+      "1 cup cooked quinoa",
+      "1/2 cup chickpeas",
+      "1 cup roasted vegetables",
+      "2 tbsp tahini",
+      "1 tbsp lemon juice"
+    ],
+    "instructions": "Cook quinoa according to package. Roast vegetables at 400F for 20 minutes. Assemble bowl with quinoa, chickpeas, and vegetables. Drizzle with tahini-lemon dressing.",
+    "detailed_instructions": [
+      {
+        "step": 1,
+        "action": "Cook quinoa",
+        "description": "Rinse 1/2 cup dry quinoa under cold water. Combine with 1 cup water in a pot. Bring to boil, reduce heat, cover and simmer for 15 minutes. Fluff with fork.",
+        "time": "20 minutes",
+        "tip": "Rinsing quinoa removes bitter coating called saponin"
+      },
+      {
+        "step": 2,
+        "action": "Prepare vegetables",
+        "description": "Preheat oven to 400°F (200°C). Chop vegetables (bell peppers, zucchini, broccoli) into bite-sized pieces. Toss with 1 tbsp olive oil, salt, and pepper.",
+        "time": "5 minutes",
+        "tip": "Cut vegetables similar size for even roasting"
+      },
+      {
+        "step": 3,
+        "action": "Roast vegetables",
+        "description": "Spread vegetables on baking sheet in single layer. Roast for 20-25 minutes, stirring halfway, until tender and slightly caramelized.",
+        "time": "25 minutes",
+        "tip": "Don't overcrowd the pan or vegetables will steam instead of roast"
+      },
+      {
+        "step": 4,
+        "action": "Prepare chickpeas",
+        "description": "If using canned, drain and rinse chickpeas. Pat dry and optionally roast with vegetables for extra crunch.",
+        "time": "2 minutes",
+        "tip": "Roasted chickpeas add great texture and flavor"
+      },
+      {
+        "step": 5,
+        "action": "Make tahini dressing",
+        "description": "Whisk together 2 tbsp tahini, 1 tbsp lemon juice, 1 tbsp water, and a pinch of salt until smooth and creamy.",
+        "time": "2 minutes",
+        "tip": "Add water gradually to reach desired consistency"
+      },
+      {
+        "step": 6,
+        "action": "Assemble bowl",
+        "description": "Place quinoa in bowl as base. Arrange roasted vegetables and chickpeas on top. Drizzle with tahini dressing. Optional: add avocado, seeds, or fresh herbs.",
+        "time": "3 minutes",
+        "tip": "Arrange ingredients in sections for beautiful presentation"
+      }
+    ],
+    "ingredient_benefits": {
+      "quinoa": {
+        "benefits": ["Complete protein (all 9 essential amino acids)", "High in fiber", "Gluten-free", "Rich in minerals", "Low glycemic index"],
+        "nutrients": "Excellent source of manganese, magnesium, phosphorus, folate, and iron",
+        "why_good": "One of few plant foods with complete protein - perfect for vegetarians"
+      },
+      "chickpeas": {
+        "benefits": ["High in plant protein", "Rich in fiber", "Supports blood sugar control", "Promotes digestive health", "May aid weight loss"],
+        "nutrients": "Good source of protein, fiber, folate, iron, and phosphorus",
+        "why_good": "Filling and nutritious - keeps you satisfied for hours"
+      },
+      "roasted_vegetables": {
+        "benefits": ["High in vitamins and minerals", "Rich in antioxidants", "Low in calories", "Supports immune function", "Anti-inflammatory"],
+        "nutrients": "Varies by vegetable - generally high in vitamins A, C, K, and fiber",
+        "why_good": "Roasting concentrates flavors and makes vegetables more appealing"
+      },
+      "tahini": {
+        "benefits": ["Rich in healthy fats", "Good source of calcium", "Contains antioxidants", "Supports bone health", "Anti-inflammatory"],
+        "nutrients": "High in calcium, magnesium, iron, and B vitamins",
+        "why_good": "Made from sesame seeds - provides healthy fats and minerals"
+      },
+      "lemon_juice": {
+        "benefits": ["High in vitamin C", "Aids digestion", "Alkalizing effect", "Boosts immune system", "Enhances iron absorption"],
+        "nutrients": "Excellent source of vitamin C and antioxidants",
+        "why_good": "Helps absorb iron from plant foods like quinoa and chickpeas"
+      }
+    },
+    "what_to_avoid": [
+      "Not rinsing quinoa - leaves bitter taste",
+      "Overcooking quinoa - makes it mushy",
+      "Overcrowding vegetables on pan - they'll steam not roast",
+      "Using old tahini - can taste rancid",
+      "Skipping lemon juice - it brightens all the flavors"
+    ],
+    "health_notes": {
+      "best_for": ["Vegetarian/vegan diets", "Weight management", "Blood sugar control", "Digestive health", "Plant-based protein"],
+      "timing": "Perfect for lunch - provides sustained energy without afternoon slump",
+      "modifications": {
+        "higher_protein": "Add tofu, tempeh, or extra chickpeas",
+        "lower_carb": "Replace half the quinoa with cauliflower rice",
+        "nut_free": "Replace tahini with sunflower seed butter",
+        "meal_prep": "Make large batch - stores well for 4-5 days"
+      }
+    },
+    "kcal_total": 480,
+    "protein_g_total": 18,
+    "carbs_g_total": 68,
+    "fat_g_total": 16,
+    "dietary_tags": ["vegan", "vegetarian"],
+    "allergen_tags": ["sesame"],
+    "prep_time_min": 35,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "dinner_001",
+    "title": "Baked Salmon with Vegetables",
+    "ingredients": [
+      "180g salmon fillet",
+      "2 cups mixed vegetables",
+      "1 tbsp olive oil",
+      "Lemon wedges",
+      "Herbs and spices"
+    ],
+    "instructions": "Preheat oven to 400F. Season salmon and vegetables with oil and spices. Bake for 15-18 minutes until salmon is cooked through. Serve with lemon.",
+    "detailed_instructions": [
+      {
+        "step": 1,
+        "action": "Preheat oven",
+        "description": "Preheat oven to 400°F (200°C). Line a baking sheet with parchment paper or lightly oil it.",
+        "time": "5 minutes",
+        "tip": "Parchment paper makes cleanup easier and prevents sticking"
+      },
+      {
+        "step": 2,
+        "action": "Prepare salmon",
+        "description": "Pat salmon fillet dry with paper towels. Check for pin bones and remove with tweezers. Season both sides with salt, pepper, and herbs (dill, thyme, or garlic powder).",
+        "time": "3 minutes",
+        "tip": "Dry salmon ensures crispy skin and better seasoning adhesion"
+      },
+      {
+        "step": 3,
+        "action": "Prepare vegetables",
+        "description": "Cut vegetables (asparagus, broccoli, bell peppers) into similar-sized pieces. Toss with olive oil, salt, and pepper.",
+        "time": "5 minutes",
+        "tip": "Choose vegetables with similar cooking times"
+      },
+      {
+        "step": 4,
+        "action": "Arrange on baking sheet",
+        "description": "Place salmon skin-side down in center of baking sheet. Arrange vegetables around salmon in single layer.",
+        "time": "2 minutes",
+        "tip": "Give vegetables space so they roast instead of steam"
+      },
+      {
+        "step": 5,
+        "action": "Bake",
+        "description": "Bake for 12-15 minutes for 1-inch thick salmon, or until internal temperature reaches 145°F (63°C). Salmon should flake easily with fork.",
+        "time": "15 minutes",
+        "tip": "Don't overcook - salmon continues cooking after removing from oven"
+      },
+      {
+        "step": 6,
+        "action": "Serve",
+        "description": "Transfer salmon and vegetables to plate. Squeeze fresh lemon juice over everything. Garnish with fresh herbs if desired.",
+        "time": "2 minutes",
+        "tip": "Lemon juice enhances flavor and helps absorb omega-3s"
+      }
+    ],
+    "ingredient_benefits": {
+      "salmon": {
+        "benefits": ["Rich in omega-3 fatty acids", "High-quality protein", "Supports heart health", "Reduces inflammation", "Promotes brain health", "Good for skin and hair"],
+        "nutrients": "Excellent source of omega-3s, vitamin D, vitamin B12, selenium, and protein",
+        "why_good": "One of the best sources of omega-3 fatty acids - essential for heart and brain health"
+      },
+      "mixed_vegetables": {
+        "benefits": ["High in vitamins and minerals", "Rich in fiber", "Low in calories", "Supports immune function", "Provides antioxidants"],
+        "nutrients": "Varies by vegetable - generally high in vitamins A, C, K, and folate",
+        "why_good": "Variety of vegetables provides diverse nutrients and phytochemicals"
+      },
+      "olive_oil": {
+        "benefits": ["Heart-healthy monounsaturated fats", "Anti-inflammatory", "Rich in antioxidants", "May lower cholesterol", "Supports brain health"],
+        "nutrients": "High in vitamin E and polyphenols",
+        "why_good": "Helps absorb fat-soluble vitamins from vegetables"
+      },
+      "lemon": {
+        "benefits": ["High in vitamin C", "Aids digestion", "Alkalizing", "Boosts immune system", "Enhances flavor without calories"],
+        "nutrients": "Excellent source of vitamin C and flavonoids",
+        "why_good": "Vitamin C helps absorb iron and enhances omega-3 absorption"
+      }
+    },
+    "what_to_avoid": [
+      "Overcooking salmon - makes it dry (aim for 145°F internal temp)",
+      "Farmed salmon with added color - choose wild-caught when possible",
+      "Cooking at too high temperature - can burn outside while inside stays raw",
+      "Not removing pin bones - unpleasant to eat",
+      "Skipping the lemon - it's essential for flavor and nutrient absorption"
+    ],
+    "health_notes": {
+      "best_for": ["Heart health", "Brain health", "Anti-inflammatory diet", "Omega-3 intake", "High-protein meals"],
+      "timing": "Perfect for dinner - omega-3s may improve sleep quality",
+      "modifications": {
+        "budget_friendly": "Use frozen salmon or substitute with mackerel",
+        "different_fish": "Try cod, halibut, or trout",
+        "more_filling": "Serve with quinoa or sweet potato",
+        "meal_prep": "Bake multiple fillets - stores for 2-3 days"
+      }
+    },
+    "kcal_total": 450,
+    "protein_g_total": 42,
+    "carbs_g_total": 18,
+    "fat_g_total": 22,
+    "dietary_tags": ["pescatarian", "omnivore", "high-protein"],
+    "allergen_tags": ["fish"],
+    "prep_time_min": 25,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "dinner_002",
+    "title": "Vegetarian Stir-Fry",
+    "ingredients": [
+      "200g firm tofu",
+      "2 cups mixed vegetables",
+      "2 tbsp soy sauce",
+      "1 tbsp sesame oil",
+      "1 cup brown rice"
+    ],
+    "instructions": "Cook rice according to package. Press and cube tofu. Stir-fry tofu until golden, add vegetables and cook until tender. Add soy sauce and sesame oil. Serve over rice.",
+    "detailed_instructions": [
+      {
+        "step": 1,
+        "action": "Cook rice",
+        "description": "Rinse 1/2 cup brown rice. Combine with 1 cup water in pot. Bring to boil, reduce heat, cover and simmer for 40-45 minutes. Let stand 5 minutes, then fluff.",
+        "time": "50 minutes",
+        "tip": "Start rice first as it takes longest - or use pre-cooked rice to save time"
+      },
+      {
+        "step": 2,
+        "action": "Press tofu",
+        "description": "Drain tofu and wrap in clean kitchen towel. Place heavy object on top (like a cast iron pan) and press for 15-20 minutes to remove excess water.",
+        "time": "20 minutes",
+        "tip": "Pressing tofu makes it crispier and helps it absorb flavors better"
+      },
+      {
+        "step": 3,
+        "action": "Prepare ingredients",
+        "description": "Cut pressed tofu into 3/4-inch cubes. Chop vegetables (bell peppers, broccoli, snap peas, carrots) into bite-sized pieces.",
+        "time": "5 minutes",
+        "tip": "Cut vegetables similar size for even cooking"
+      },
+      {
+        "step": 4,
+        "action": "Cook tofu",
+        "description": "Heat 1 tbsp oil in large wok or skillet over medium-high heat. Add tofu cubes in single layer. Cook 3-4 minutes per side until golden and crispy. Remove and set aside.",
+        "time": "10 minutes",
+        "tip": "Don't move tofu too much - let it develop a golden crust"
+      },
+      {
+        "step": 5,
+        "action": "Stir-fry vegetables",
+        "description": "Add vegetables to same pan. Stir-fry for 5-7 minutes until tender-crisp. Add harder vegetables (carrots, broccoli) first, softer ones (peppers, snap peas) later.",
+        "time": "7 minutes",
+        "tip": "Keep vegetables moving for even cooking and to prevent burning"
+      },
+      {
+        "step": 6,
+        "action": "Combine and season",
+        "description": "Return tofu to pan. Add soy sauce and sesame oil. Toss everything together for 1-2 minutes. Serve immediately over brown rice.",
+        "time": "2 minutes",
+        "tip": "Add sauce at the end to prevent burning and maintain crispy tofu"
+      }
+    ],
+    "ingredient_benefits": {
+      "tofu": {
+        "benefits": ["Complete plant protein", "Contains all essential amino acids", "Rich in iron and calcium", "May reduce cholesterol", "Supports bone health"],
+        "nutrients": "Good source of protein, iron, calcium, magnesium, and isoflavones",
+        "why_good": "Versatile plant protein that absorbs flavors well - great meat alternative"
+      },
+      "mixed_vegetables": {
+        "benefits": ["High in vitamins and minerals", "Rich in fiber", "Low in calories", "Supports immune function", "Provides antioxidants"],
+        "nutrients": "Varies by vegetable - generally high in vitamins A, C, K, and fiber",
+        "why_good": "Variety provides diverse nutrients and makes meal more satisfying"
+      },
+      "soy_sauce": {
+        "benefits": ["Adds umami flavor", "Contains antioxidants", "Fermented food benefits", "Low in calories", "Enhances other flavors"],
+        "nutrients": "Contains small amounts of protein and minerals",
+        "why_good": "Adds depth of flavor with minimal calories - use low-sodium version"
+      },
+      "sesame_oil": {
+        "benefits": ["Rich in antioxidants", "Contains healthy fats", "Anti-inflammatory", "May lower blood pressure", "Adds nutty flavor"],
+        "nutrients": "Good source of vitamin E and omega-6 fatty acids",
+        "why_good": "Small amount adds big flavor - use as finishing oil"
+      },
+      "brown_rice": {
+        "benefits": ["Whole grain with fiber", "Provides sustained energy", "Rich in minerals", "Supports digestive health", "May reduce diabetes risk"],
+        "nutrients": "Good source of manganese, selenium, magnesium, and B vitamins",
+        "why_good": "More nutritious than white rice - keeps you full longer"
+      }
+    },
+    "what_to_avoid": [
+      "Not pressing tofu - results in soggy, bland tofu",
+      "Overcrowding the pan - tofu won't get crispy",
+      "Using silken tofu - too soft for stir-frying (use firm or extra-firm)",
+      "Too much soy sauce - can be overly salty",
+      "Overcooking vegetables - they should be tender-crisp, not mushy"
+    ],
+    "health_notes": {
+      "best_for": ["Vegetarian/vegan diets", "Plant-based protein", "Heart health", "Weight management", "Cholesterol reduction"],
+      "timing": "Great for dinner - satisfying and nutritious",
+      "modifications": {
+        "higher_protein": "Use extra-firm tofu or add edamame",
+        "lower_carb": "Replace rice with cauliflower rice",
+        "gluten_free": "Use tamari instead of soy sauce",
+        "more_flavor": "Add ginger, garlic, or chili flakes"
+      }
+    },
+    "kcal_total": 520,
+    "protein_g_total": 24,
+    "carbs_g_total": 72,
+    "fat_g_total": 16,
+    "dietary_tags": ["vegan", "vegetarian"],
+    "allergen_tags": ["soy", "sesame"],
+    "prep_time_min": 30,
+    "cooking_skill": 2
+  },
+  {
+    "recipe_id": "snack_001",
+    "title": "Greek Yogurt with Nuts",
+    "ingredients": [
+      "1 cup Greek yogurt",
+      "1/4 cup mixed nuts",
+      "1 tbsp honey"
+    ],
+    "instructions": "Place yogurt in bowl, top with nuts and drizzle with honey.",
+    "detailed_instructions": [
+      {
+        "step": 1,
+        "action": "Choose yogurt",
+        "description": "Use plain, full-fat or 2% Greek yogurt. Avoid flavored varieties with added sugar.",
+        "time": "30 seconds",
+        "tip": "Full-fat yogurt is more satisfying and helps absorb fat-soluble vitamins"
+      },
+      {
+        "step": 2,
+        "action": "Prepare nuts",
+        "description": "Measure 1/4 cup mixed nuts (almonds, walnuts, pecans). Optionally toast in dry pan for 2-3 minutes for enhanced flavor.",
+        "time": "1 minute",
+        "tip": "Toasting nuts brings out their natural oils and makes them crunchier"
+      },
+      {
+        "step": 3,
+        "action": "Assemble",
+        "description": "Spoon Greek yogurt into bowl. Sprinkle nuts on top. Drizzle with honey in a decorative pattern.",
+        "time": "1 minute",
+        "tip": "Layer ingredients for visual appeal and better flavor distribution"
+      }
+    ],
+    "ingredient_benefits": {
+      "greek_yogurt": {
+        "benefits": ["High in protein", "Rich in probiotics", "Supports gut health", "Good source of calcium", "May aid weight loss", "Supports bone health"],
+        "nutrients": "Excellent source of protein, calcium, vitamin B12, and probiotics",
+        "why_good": "Double the protein of regular yogurt - keeps you full and supports muscle"
+      },
+      "mixed_nuts": {
+        "benefits": ["Healthy fats", "Rich in antioxidants", "Supports heart health", "May improve brain function", "Provides sustained energy"],
+        "nutrients": "Good source of vitamin E, magnesium, healthy fats, and fiber",
+        "why_good": "Combination of protein, healthy fats, and fiber provides lasting satiety"
+      },
+      "honey": {
+        "benefits": ["Natural sweetener", "Contains antioxidants", "Antibacterial properties", "May soothe throat", "Better than refined sugar"],
+        "nutrients": "Contains trace amounts of vitamins and minerals",
+        "why_good": "Provides sweetness with some beneficial compounds"
+      }
+    },
+    "what_to_avoid": [
+      "Flavored yogurt - often contains as much sugar as ice cream",
+      "Low-fat or fat-free yogurt - less satisfying and may have added sugar",
+      "Salted or candied nuts - adds unnecessary sodium and sugar",
+      "Too much honey - stick to 1 tbsp to control sugar",
+      "Yogurt with artificial sweeteners - may disrupt gut bacteria"
+    ],
+    "health_notes": {
+      "best_for": ["High-protein snack", "Gut health", "Bone health", "Post-workout recovery", "Weight management"],
+      "timing": "Perfect afternoon snack or post-workout - protein aids recovery",
+      "modifications": {
+        "higher_protein": "Add protein powder or extra nuts",
+        "lower_sugar": "Skip honey or use cinnamon for sweetness",
+        "dairy_free": "Use coconut or almond yogurt",
+        "add_fruit": "Top with berries for extra antioxidants"
+      }
+    },
+    "kcal_total": 280,
+    "protein_g_total": 18,
+    "carbs_g_total": 24,
+    "fat_g_total": 12,
+    "dietary_tags": ["vegetarian", "ovo-lacto", "high-protein"],
+    "allergen_tags": ["dairy", "nuts"],
+    "prep_time_min": 2,
+    "cooking_skill": 0
+  },
+  {
+    "recipe_id": "snack_002",
+    "title": "Apple with Almond Butter",
+    "ingredients": [
+      "1 medium apple",
+      "2 tbsp almond butter"
+    ],
+    "instructions": "Slice apple and serve with almond butter for dipping.",
+    "detailed_instructions": [
+      {
+        "step": 1,
+        "action": "Choose apple",
+        "description": "Select a crisp apple variety like Honeycrisp, Fuji, or Granny Smith. Wash thoroughly under running water.",
+        "time": "1 minute",
+        "tip": "Different varieties offer different sweetness levels - Granny Smith is tart, Fuji is sweet"
+      },
+      {
+        "step": 2,
+        "action": "Slice apple",
+        "description": "Cut apple into quarters, remove core, then slice each quarter into 3-4 wedges. Aim for 12-16 slices total.",
+        "time": "2 minutes",
+        "tip": "Squeeze lemon juice on slices to prevent browning if not eating immediately"
+      },
+      {
+        "step": 3,
+        "action": "Prepare almond butter",
+        "description": "Measure 2 tbsp almond butter into small bowl. If too thick, stir in a few drops of water to make it more dippable.",
+        "time": "30 seconds",
+        "tip": "Choose natural almond butter with no added sugar or oils"
+      },
+      {
+        "step": 4,
+        "action": "Serve",
+        "description": "Arrange apple slices on plate with almond butter in center for dipping. Optional: sprinkle cinnamon on apple slices.",
+        "time": "30 seconds",
+        "tip": "Cinnamon adds flavor and may help regulate blood sugar"
+      }
+    ],
+    "ingredient_benefits": {
+      "apple": {
+        "benefits": ["High in fiber (pectin)", "Rich in antioxidants", "Supports heart health", "May aid weight loss", "Promotes gut health", "Low glycemic index"],
+        "nutrients": "Good source of vitamin C, potassium, and fiber",
+        "why_good": "Fiber keeps you full and supports digestive health - eat with skin for maximum benefits"
+      },
+      "almond_butter": {
+        "benefits": ["Healthy monounsaturated fats", "Good source of protein", "Rich in vitamin E", "Supports heart health", "May lower cholesterol", "Provides sustained energy"],
+        "nutrients": "Excellent source of vitamin E, magnesium, healthy fats, and protein",
+        "why_good": "Combination of protein and healthy fats balances apple's natural sugars"
+      }
+    },
+    "what_to_avoid": [
+      "Peeling the apple - most fiber and nutrients are in the skin",
+      "Almond butter with added sugar or palm oil - choose natural",
+      "Too much almond butter - stick to 2 tbsp (it's calorie-dense)",
+      "Eating apple alone - adding fat/protein prevents blood sugar spike",
+      "Browning apple slices - use lemon juice if preparing ahead"
+    ],
+    "health_notes": {
+      "best_for": ["Quick energy", "Pre-workout snack", "Blood sugar control", "Heart health", "Weight management"],
+      "timing": "Perfect afternoon snack or pre-workout - provides quick and sustained energy",
+      "modifications": {
+        "nut_free": "Use sunflower seed butter instead",
+        "more_protein": "Add a hard-boiled egg on the side",
+        "different_nut_butter": "Try peanut, cashew, or sunflower seed butter",
+        "add_toppings": "Sprinkle with chia seeds, hemp seeds, or cinnamon"
+      }
+    },
+    "kcal_total": 220,
+    "protein_g_total": 6,
+    "carbs_g_total": 28,
+    "fat_g_total": 10,
+    "dietary_tags": ["vegan", "vegetarian"],
+    "allergen_tags": ["nuts", "tree-nuts"],
+    "prep_time_min": 3,
+    "cooking_skill": 0
+  }
+]
