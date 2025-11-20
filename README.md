@@ -374,7 +374,7 @@ http://localhost:3000/preferences.html
 
 ---
 
-## 🔌 API Documentation
+##  API Documentation
 
 ### Generate Daily Plan
 
@@ -615,7 +615,7 @@ python scripts/index_recipes.py data/sample_recipes.json
 
 ---
 
-## 🧪 Testing
+##  Testing
 
 ### Run Integration Tests
 
@@ -657,7 +657,7 @@ curl -X POST http://localhost:8000/api/v1/generate-plan \
 
 ---
 
-## 🔧 Troubleshooting
+##  Troubleshooting
 
 ### Common Issues
 
@@ -743,7 +743,7 @@ curl http://localhost:8000/api/v1/health
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! Please follow these guidelines:
 
@@ -772,13 +772,13 @@ Contributions are welcome! Please follow these guidelines:
 
 ---
 
-## 📄 License
+##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - **Mifflin-St Jeor Equation** for BMR calculations
 - **Chart.js** for data visualization
@@ -788,7 +788,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 📞 Support
+##  Support
 
 For issues, questions, or suggestions:
 
@@ -799,9 +799,9 @@ For issues, questions, or suggestions:
 
 ---
 
-## 🗺️ Roadmap
+##  Roadmap
 
-### Completed ✅
+### Completed 
 - Core meal planning
 - Weekly planning with variety
 - Progress tracking
@@ -810,7 +810,7 @@ For issues, questions, or suggestions:
 - Interactive visualizations
 - Clean UI design
 
-### Planned 🚧
+### Planned 
 - Multi-step wizard form
 - Grocery list generator
 - PDF export with styling
@@ -821,7 +821,7 @@ For issues, questions, or suggestions:
 
 ---
 
-## 📊 System Metrics
+##  System Metrics
 
 ### Performance
 - API Response Time: <2s for daily plan
@@ -845,7 +845,7 @@ For issues, questions, or suggestions:
 
 ---
 
-## 🎉 Quick Reference
+##  Quick Reference
 
 ### Start System
 ```bash
@@ -869,8 +869,8 @@ cd frontend && python -m http.server 3000
 
 ---
 
-**Built with ❤️ for better nutrition and health**
+
 
 **Version**: 1.0.0  
 **Last Updated**: November 2025  
-**Status**: Production Ready 🚀
+**Status**: Production Ready 
