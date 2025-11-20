@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Meal Plan Generator</title>
+    <style>
+        /* Navigation Bar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            margin-bottom: 20px;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+        
+        .nav-links a:hover {
+            color: #667eea;
+            background: #f0f0f0;
+        }
+        
+        .nav-links a.active {
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .activity-day {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .activity-day label {
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+        
+        button {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .weekly-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .summary-item {
+            text-align: center;
+        }
+        
+        .summary-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .summary-label {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .day-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: all 0.3s;
+        }
+        
+        .day-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.1);
+        }
+        
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .day-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            text-transform: capitalize;
+        }
+        
+        .day-date {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .activity-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .nutrition-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .nutrition-stat {
+            text-align: center;
+        }
+        
+        .nutrition-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .nutrition-stat-label {
+            font-size: 11px;
+            color: #666;
+            margin-top: 3px;
+        }
+        
+        .meal-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+        
+        .meal-type-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #764ba2;
+            color: white;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        
+        .meal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .meal-nutrition {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .collapsible {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .collapsible.expanded {
+            max-height: 2000px;
+        }
+        
+        .expand-btn {
+            background: none;
+            color: #667eea;
+            padding: 8px 0;
+            font-size: 14px;
+            text-decoration: underline;
+        }
+        
+        .ingredients-list {
+            list-style: none;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+        
+        .ingredients-list li:before {
+            content: "• ";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        /* Enhanced Presentation Styles */
+        .meal-plan-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .meal-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            color: #333;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .section-tips {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+        }
+        
+        .tips-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .tips-list li {
+            padding: 8px 0;
+            color: #856404;
+        }
+        
+        .audience-notes {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">🥗 Diet Planner</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="daily.html">Daily Plan</a></li>
+                <li><a href="weekly.html" class="active">Weekly Plan</a></li>
+                <li><a href="progress.html">Progress Tracker</a></li>
+                <li><a href="preferences.html">Preferences</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1>📅 Weekly Meal Plan Generator</h1>
+        <p class="subtitle">Get a complete 7-day personalized meal plan with recipe variety and activity-based adjustments</p>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('form')">Create Plan</button>
+            <button class="tab" onclick="showTab('view')" id="view-tab" style="display: none;">View Plan</button>
+        </div>
+        
+        <div id="form-section">
+            <form id="weekly-form">
+                <h3 style="margin-bottom: 20px;">Your Profile</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="user_id">User ID *</label>
+                        <input type="text" id="user_id" name="user_id" required placeholder="e.g., john_doe">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="age">Age *</label>
+                        <input type="number" id="age" name="age" required min="10" max="120">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sex">Sex *</label>
+                        <select id="sex" name="sex" required>
+                            <option value="">Select...</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="weight">Weight (kg) *</label>
+                        <input type="number" id="weight" name="weight_kg" required min="30" max="300" step="0.1">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="height">Height (cm) *</label>
+                        <input type="number" id="height" name="height_cm" required min="100" max="250" step="0.1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="goal">Goal *</label>
+                        <select id="goal" name="goal" required>
+                            <option value="">Select...</option>
+                            <option value="lose">Lose Weight</option>
+                            <option value="maintain">Maintain Weight</option>
+                            <option value="gain">Gain Weight</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="diet">Dietary Preference *</label>
+                        <select id="diet" name="diet_pref" required>
+                            <option value="">Select...</option>
+                            <option value="vegan">Vegan</option>
+                            <option value="vegetarian">Vegetarian</option>
+                            <option value="ovo-lacto">Ovo-Lacto Vegetarian</option>
+                            <option value="pesco">Pescatarian</option>
+                            <option value="omnivore">Omnivore</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cooking_skill">Cooking Skill (0-5) *</label>
+                        <input type="number" id="cooking_skill" name="cooking_skill" required min="0" max="5" value="3">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="allergies">Allergies (comma-separated)</label>
+                    <input type="text" id="allergies" name="allergies" placeholder="e.g., nuts, dairy, eggs">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="wake_time">Wake Time *</label>
+                        <input type="time" id="wake_time" name="wake_time" required value="07:00">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lunch_time">Lunch Time *</label>
+                        <input type="time" id="lunch_time" name="lunch_time" required value="12:00">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dinner_time">Dinner Time *</label>
+                        <input type="time" id="dinner_time" name="dinner_time" required value="19:00">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="max_repeats">Max Recipe Repeats *</label>
+                        <input type="number" id="max_repeats" name="max_recipe_repeats" required min="1" max="7" value="1">
+                        <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                            Set to 1 for no repeats, 2-3 for more flexibility
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="target_audience">I am a... *</label>
+                    <select id="target_audience" name="target_audience" required>
+                        <option value="general">General (No specific preference)</option>
+                        <option value="student">Student (Budget-friendly, quick meals)</option>
+                        <option value="working_professional">Working Professional (Meal prep, office-friendly)</option>
+                        <option value="gym_goer">Gym Goer (High protein, workout timing)</option>
+                        <option value="beginner_cook">Beginner Cook (Simple, step-by-step)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="include_tips" name="include_tips" checked style="width: auto;">
+                        <span>Include personalized tips and advice</span>
+                    </label>
+                </div>
+                
+                <h3 style="margin: 30px 0 20px 0;">Weekly Activity Pattern</h3>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Set your activity level for each day of the week</p>
+                
+                <div class="activity-grid">
+                    <div class="activity-day">
+                        <label>Monday</label>
+                        <select name="activity_monday" required>
+                            <option value="rest">Rest</option>
+                            <option value="light">Light</option>
+                            <option value="moderate" selected>Moderate</option>
+                            <option value="active">Active</option>
+                            <option value="very_active">Very Active</option>
+                        </select>
+                    </div>
+                    <div class="activity-day">
+                        <label>Tuesday</label>
+                        <select name="activity_tuesday" required>
+                            <option value="rest">Rest</option>
+                            <option value="light">Light</option>
+                            <option value="moderate" selected>Moderate</option>
+                            <option value="active">Active</option>
+                            <option value="very_active">Very Active</option>
+                        </select>
+                    </div>
+                    <div class="activity-day">
+                        <label>Wednesday</label>
+                        <select name="activity_wednesday" required>
+                            <option value="rest">Rest</option>
+                            <option value="light">Light</option>
+                            <option value="moderate" selected>Moderate</option>
+                            <option value="active">Active</option>
+                            <option value="very_active">Very Active</option>
+                        </select>
+                    </div>
+                    <div class="activity-day">
+                        <label>Thursday</label>
+                        <select name="activity_thursday" required>
+                            <option value="rest">Rest</option>
+                            <option value="light">Light</option>
+                            <option value="moderate" selected>Moderate</option>
+                            <option value="active">Active</option>
+                            <option value="very_active">Very Active</option>
+                        </select>
+                    </div>
+                    <div class="activity-day">
+                        <label>Friday</label>
+                        <select name="activity_friday" required>
+                            <option value="rest">Rest</option>
+                            <option value="light">Light</option>
+                            <option value="moderate" selected>Moderate</option>
+                            <option value="active">Active</option>
+                            <option value="very_active">Very Active</option>
+                        </select>
+                    </div>
+                    <div class="activity-day">
+                        <label>Saturday</label>
+                        <select name="activity_saturday" required>
+                            <option value="rest">Rest</option>
+                            <option value="light" selected>Light</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="active">Active</option>
+                            <option value="very_active">Very Active</option>
+                        </select>
+                    </div>
+                    <div class="activity-day">
+                        <label>Sunday</label>
+                        <select name="activity_sunday" required>
+                            <option value="rest" selected>Rest</option>
+                            <option value="light">Light</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="active">Active</option>
+                            <option value="very_active">Very Active</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button type="submit" id="submit-btn">Generate 7-Day Meal Plan</button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <h3>Generating your 7-day meal plan...</h3>
+            <p style="color: #666; margin-top: 10px;">This may take 30-60 seconds</p>
+        </div>
+        
+        <div id="error" class="error hidden"></div>
+        
+        <div id="plan-section" class="hidden"></div>
+    </div>
+    
+    <script src="weekly.js"></script>
+</body>
+</html>

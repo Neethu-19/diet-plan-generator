@@ -4,7 +4,7 @@ FastAPI endpoints for meal plan generation and management.
 from fastapi import APIRouter, HTTPException, Depends
 from datetime import datetime
 import uuid
-from typing import Dict, List
+from typing import Dict, List, Any
 
 from src.models.schemas import (
     GeneratePlanRequest, GeneratePlanResponse,
@@ -12,7 +12,9 @@ from src.models.schemas import (
     EstimateNutritionRequest, EstimateNutritionResponse,
     HealthResponse, MealPlan, Meal, MealPlanSource,
     RecipeCandidate, DailyPlanResponse, WeeklyPlanSummary,
-    WeeklyPlanListResponse
+    WeeklyPlanListResponse, WeeklyPlanResponse, WeeklyPlanMeal,
+    ProgressLogRequest, ProgressLogResponse, ProgressHistoryResponse,
+    ProgressAnalysis
 )
 from src.core.nutrition_engine import NutritionEngine
 from src.core.rag_module import RAGModule
@@ -68,6 +70,7 @@ def get_validator():
 @router.post("/generate-plan", response_model=GeneratePlanResponse)
 async def generate_plan(
     request: GeneratePlanRequest,
+    include_debug: bool = False,
     engine: NutritionEngine = Depends(get_nutrition_engine),
     rag: RAGModule = Depends(get_rag_module),
     llm: LLMOrchestrator = Depends(get_llm_orchestrator),
@@ -78,33 +81,60 @@ async def generate_plan(
     
     Args:
         request: User profile and preferences
+        include_debug: Include detailed scoring breakdown in response
         
     Returns:
         Generated meal plan with nutrition information
     """
     try:
-        logger.info(f"Generating meal plan for user: {request.user_profile.user_id}")
+        logger.info(f"Generating meal plan for user: {request.user_profile.user_id} (debug={include_debug})")
         
         # Step 1: Calculate nutrition targets
         logger.info("Calculating nutrition targets...")
         nutrition_targets = engine.calculate_nutrition_targets(request.user_profile)
         
-        # Step 2: Retrieve recipe candidates for each meal
-        logger.info("Retrieving recipe candidates...")
+        # Step 2: Retrieve user preferences (optional)
+        user_preferences = None
+        try:
+            from src.services.preference_service import PreferenceService
+            from src.data.database import SessionLocal
+            
+            with SessionLocal() as pref_db:
+                pref_service = PreferenceService(pref_db)
+                user_preferences = pref_service.get_user_preferences(request.user_profile.user_id)
+                logger.info(f"Retrieved preferences for user {request.user_profile.user_id}")
+        except Exception as e:
+            logger.warning(f"Could not retrieve preferences: {e}")
+            user_preferences = {
+                "liked_recipes": set(),
+                "disliked_recipes": set(),
+                "regional_profile": "global"
+            }
+        
+        # Step 3: Retrieve recipe candidates for each meal with preferences
+        logger.info("Retrieving recipe candidates with preferences and advanced scoring...")
         meal_candidates = {}
         
         for meal_type, target_kcal in nutrition_targets.meal_splits.items():
-            candidates = rag.retrieve_candidates(
+            # Use preference-aware method
+            candidates = rag.retrieve_candidates_with_preferences(
                 meal_type=meal_type,
                 target_kcal=target_kcal,
                 diet_pref=request.user_profile.diet_pref,
                 allergens=request.user_profile.allergies,
-                top_k=3
+                user_skill=request.user_profile.cooking_skill,
+                max_prep_time=None,  # Could be added to user profile
+                recently_used_recipes=None,  # Could track from user history
+                liked_recipes=user_preferences["liked_recipes"],
+                disliked_recipes=user_preferences["disliked_recipes"],
+                regional_profile=user_preferences["regional_profile"],
+                top_k=3,
+                include_debug=include_debug
             )
             meal_candidates[meal_type] = candidates
-            logger.info(f"Retrieved {len(candidates)} candidates for {meal_type}")
+            logger.info(f"Retrieved {len(candidates)} preference-adjusted candidates for {meal_type}")
         
-        # Step 3: Generate meal plan (use simple planner for now - LLM has context issues)
+        # Step 4: Generate meal plan (use simple planner for now - LLM has context issues)
         logger.info("Generating meal plan with simple deterministic planner...")
         from src.services.simple_planner import SimplePlanner
         simple_planner = SimplePlanner()
@@ -115,7 +145,7 @@ async def generate_plan(
             meal_targets=nutrition_targets.meal_splits
         )
         
-        # Step 4: Validate meal plan
+        # Step 5: Validate meal plan
         logger.info("Validating meal plan...")
         is_valid, errors = val.validate_meal_plan(
             meal_plan=meal_plan_dict,
@@ -128,12 +158,29 @@ async def generate_plan(
             logger.warning(f"Validation warnings: {errors}")
             # Don't fail - the simple planner generates valid plans
         
-        # Step 5: Convert to Pydantic model
+        # Step 6: Convert to Pydantic model
         meal_plan = MealPlan(**meal_plan_dict)
+        
+        # Step 7: Generate enhanced presentation if requested
+        enhanced_presentation = None
+        if request.target_audience or request.include_tips:
+            from src.services.meal_presentation_service import MealPresentationService
+            
+            presentation_service = MealPresentationService()
+            enhanced_presentation = presentation_service.generate_enhanced_presentation(
+                meal_plan=meal_plan,
+                target_audience=request.target_audience,
+                include_tips=request.include_tips
+            )
+            logger.info(f"Generated enhanced presentation for {request.target_audience.value}")
         
         logger.info(f"Successfully generated meal plan: {meal_plan.plan_id}")
         
-        return GeneratePlanResponse(meal_plan=meal_plan, status="success")
+        return GeneratePlanResponse(
+            meal_plan=meal_plan,
+            enhanced_presentation=enhanced_presentation,
+            status="success"
+        )
         
     except HTTPException:
         raise
@@ -183,6 +230,7 @@ async def swap_meal(
 @router.get("/recipes/{recipe_id}")
 async def get_recipe(
     recipe_id: str,
+    include_scoring: bool = False,
     rag: RAGModule = Depends(get_rag_module)
 ):
     """
@@ -190,12 +238,13 @@ async def get_recipe(
     
     Args:
         recipe_id: Recipe identifier
+        include_scoring: Include example scoring breakdown
         
     Returns:
         Recipe details with nutrition information
     """
     try:
-        logger.info(f"Retrieving recipe: {recipe_id}")
+        logger.info(f"Retrieving recipe: {recipe_id} (include_scoring={include_scoring})")
         
         # Get recipe from vector database
         recipe_metadata = rag.vector_db.get_recipe(recipe_id)
@@ -208,6 +257,22 @@ async def get_recipe(
         
         # Add recipe_id to metadata
         recipe_data = {"recipe_id": recipe_id, **recipe_metadata}
+        
+        # Add example scoring breakdown if requested
+        if include_scoring:
+            # Generate example score breakdown for typical targets
+            example_target_kcal = recipe_metadata.get("kcal_total", 500)
+            example_breakdown = rag._calculate_advanced_score_with_breakdown(
+                recipe_id=recipe_id,
+                recipe_metadata=recipe_metadata,
+                semantic_similarity=0.85,  # Example value
+                target_kcal=example_target_kcal,
+                required_tags=set(),
+                user_skill=3,
+                max_prep_time=None,
+                recently_used_recipes=None
+            )
+            recipe_data["example_scoring"] = example_breakdown
         
         return recipe_data
         
@@ -305,12 +370,15 @@ async def health_check():
 
 # Weekly Plan Endpoints
 
-@router.post("/generate-weekly-plan")
+@router.post("/generate-weekly-plan", response_model=WeeklyPlanResponse)
 async def generate_weekly_plan(
     user_profile: Dict,
     activity_pattern: Dict[str, str],
     start_date: str = None,
     max_recipe_repeats: int = 2,
+    target_audience: str = "general",
+    include_tips: bool = True,
+    include_debug: bool = False,
     db: Session = Depends(get_db)
 ):
     """
@@ -321,10 +389,11 @@ async def generate_weekly_plan(
         activity_pattern: Activity level for each day (e.g., {"monday": "active", ...})
         start_date: Start date in ISO format (defaults to today)
         max_recipe_repeats: Maximum times a recipe can repeat in the week
+        include_debug: Include detailed scoring breakdown in meals
         db: Database session
         
     Returns:
-        Generated weekly meal plan
+        Generated weekly meal plan with all 7 days
     """
     try:
         from src.models.schemas import UserProfile
@@ -338,6 +407,22 @@ async def generate_weekly_plan(
         else:
             start_dt = datetime.now()
         
+        # Retrieve user preferences (optional)
+        user_preferences = None
+        try:
+            from src.services.preference_service import PreferenceService
+            
+            pref_service = PreferenceService(db)
+            user_preferences = pref_service.get_user_preferences(profile.user_id)
+            logger.info(f"Retrieved preferences for weekly plan user {profile.user_id}")
+        except Exception as e:
+            logger.warning(f"Could not retrieve preferences for weekly plan: {e}")
+            user_preferences = {
+                "liked_recipes": set(),
+                "disliked_recipes": set(),
+                "regional_profile": "global"
+            }
+        
         # Initialize weekly planner with database session
         planner = WeeklyPlanner(db_session=db)
         
@@ -346,15 +431,90 @@ async def generate_weekly_plan(
             user_profile=profile,
             activity_pattern=activity_pattern,
             start_date=start_dt,
-            max_recipe_repeats=max_recipe_repeats
+            max_recipe_repeats=max_recipe_repeats,
+            include_debug=include_debug,
+            user_preferences=user_preferences
         )
         
         logger.info(f"Generated weekly plan {weekly_plan['week_plan_id']}")
         
-        return {
-            "status": "success",
-            "weekly_plan": weekly_plan
-        }
+        # Generate enhanced presentation if requested
+        enhanced_presentation = None
+        if target_audience != "general" or include_tips:
+            from src.services.meal_presentation_service import MealPresentationService
+            from src.models.schemas import TargetAudience
+            
+            # Convert first day's meal plan for presentation
+            if weekly_plan['days'] and len(weekly_plan['days']) > 0:
+                first_day_meals = weekly_plan['days'][0]['meal_plan']
+                first_day_plan = MealPlan(**first_day_meals)
+                
+                presentation_service = MealPresentationService()
+                try:
+                    audience_enum = TargetAudience(target_audience)
+                except ValueError:
+                    audience_enum = TargetAudience.GENERAL
+                    
+                enhanced_presentation = presentation_service.generate_enhanced_presentation(
+                    meal_plan=first_day_plan,
+                    target_audience=audience_enum,
+                    include_tips=include_tips
+                )
+                logger.info(f"Generated enhanced presentation for weekly plan with {target_audience}")
+        
+        # Convert to response format with all 7 days
+        daily_plans = []
+        for day in weekly_plan['days']:
+            meals = []
+            for meal in day['meal_plan']['meals']:
+                weekly_meal = WeeklyPlanMeal(
+                    meal_type=meal['meal_type'],
+                    recipe_id=meal['recipe_id'],
+                    recipe_title=meal['recipe_title'],
+                    servings=float(meal['portion_size'].split('x')[0]) if 'x' in meal['portion_size'] else 1.0,
+                    nutrition_per_serving={
+                        "kcal": meal['kcal'],
+                        "protein_g": meal['protein_g'],
+                        "carbs_g": meal['carbs_g'],
+                        "fat_g": meal['fat_g']
+                    },
+                    total_nutrition={
+                        "kcal": meal['kcal'],
+                        "protein_g": meal['protein_g'],
+                        "carbs_g": meal['carbs_g'],
+                        "fat_g": meal['fat_g']
+                    },
+                    ingredients=meal['ingredients'],
+                    instructions=meal.get('instructions'),
+                    prep_time_min=meal.get('prep_time_min'),
+                    cook_time_min=meal.get('cook_time_min')
+                )
+                meals.append(weekly_meal)
+            
+            daily_plan = DailyPlanResponse(
+                day_plan_id=day['meal_plan'].get('plan_id', f"day_{day['day_index']}"),
+                day_index=day['day_index'],
+                date=day['date'],
+                day_name=day['day_name'],
+                activity_level=day['activity_level'],
+                meals=meals,
+                total_nutrition=day['meal_plan']['total_nutrition'],
+                adjusted_targets=day['nutrition_targets']
+            )
+            daily_plans.append(daily_plan)
+        
+        return WeeklyPlanResponse(
+            week_plan_id=weekly_plan['week_plan_id'],
+            user_id=weekly_plan['user_id'],
+            start_date=weekly_plan['start_date'],
+            end_date=weekly_plan['end_date'],
+            activity_pattern=weekly_plan['activity_pattern'],
+            variety_score=weekly_plan['weekly_stats']['variety_score'],
+            max_recipe_repeats=max_recipe_repeats,
+            daily_plans=daily_plans,
+            weekly_stats=weekly_plan['weekly_stats'],
+            enhanced_presentation=enhanced_presentation
+        )
         
     except Exception as e:
         logger.error(f"Error generating weekly plan: {e}", exc_info=True)
@@ -364,17 +524,17 @@ async def generate_weekly_plan(
         )
 
 
-@router.get("/weekly-plan/{week_plan_id}")
+@router.get("/weekly-plan/{week_plan_id}", response_model=WeeklyPlanResponse)
 async def get_weekly_plan(week_plan_id: str, db: Session = Depends(get_db)):
     """
-    Retrieve a weekly plan by ID.
+    Retrieve a weekly plan by ID with all 7 days.
     
     Args:
         week_plan_id: Weekly plan identifier
         db: Database session
         
     Returns:
-        Weekly plan data
+        Complete weekly plan with all daily plans
     """
     try:
         repository = WeeklyPlanRepository(db)
@@ -386,14 +546,67 @@ async def get_weekly_plan(week_plan_id: str, db: Session = Depends(get_db)):
                 detail=f"Weekly plan {week_plan_id} not found"
             )
         
-        # Convert to dict
-        planner = WeeklyPlanner()
-        weekly_plan = planner._model_to_dict(db_plan)
+        # Convert to response format
+        daily_plans = []
+        for db_day in db_plan.daily_plans:
+            meals = []
+            for db_meal in db_day.meals:
+                meal = WeeklyPlanMeal(
+                    meal_type=db_meal.meal_type,
+                    recipe_id=db_meal.recipe_id,
+                    recipe_title=db_meal.recipe_title,
+                    servings=db_meal.servings,
+                    nutrition_per_serving={
+                        "kcal": db_meal.kcal_per_serving,
+                        "protein_g": db_meal.protein_g_per_serving,
+                        "carbs_g": db_meal.carbs_g_per_serving,
+                        "fat_g": db_meal.fat_g_per_serving
+                    },
+                    total_nutrition={
+                        "kcal": db_meal.total_kcal,
+                        "protein_g": db_meal.total_protein_g,
+                        "carbs_g": db_meal.total_carbs_g,
+                        "fat_g": db_meal.total_fat_g
+                    },
+                    ingredients=db_meal.ingredients,
+                    instructions=db_meal.instructions,
+                    prep_time_min=db_meal.prep_time_min,
+                    cook_time_min=db_meal.cook_time_min
+                )
+                meals.append(meal)
+            
+            daily_plan = DailyPlanResponse(
+                day_plan_id=db_day.day_plan_id,
+                day_index=db_day.day_index,
+                date=db_day.date.isoformat(),
+                day_name=db_day.day_name,
+                activity_level=db_day.activity_level,
+                meals=meals,
+                total_nutrition={
+                    "kcal": db_day.total_kcal,
+                    "protein_g": db_day.total_protein_g,
+                    "carbs_g": db_day.total_carbs_g,
+                    "fat_g": db_day.total_fat_g
+                },
+                adjusted_targets={
+                    "target_kcal": db_day.target_kcal,
+                    "protein_g": db_day.target_protein_g,
+                    "carbs_g": db_day.target_carbs_g,
+                    "fat_g": db_day.target_fat_g
+                }
+            )
+            daily_plans.append(daily_plan)
         
-        return {
-            "status": "success",
-            "weekly_plan": weekly_plan
-        }
+        return WeeklyPlanResponse(
+            week_plan_id=db_plan.week_plan_id,
+            user_id=db_plan.user_id,
+            start_date=db_plan.start_date.isoformat(),
+            end_date=db_plan.end_date.isoformat(),
+            activity_pattern=db_plan.activity_pattern,
+            variety_score=db_plan.variety_score,
+            max_recipe_repeats=db_plan.max_recipe_repeats,
+            daily_plans=daily_plans
+        )
         
     except HTTPException:
         raise
@@ -569,10 +782,10 @@ async def get_tomorrow_plan(user_id: str, db: Session = Depends(get_db)):
         )
 
 
-@router.get("/weekly-plan/week/{user_id}")
+@router.get("/weekly-plan/week/{user_id}", response_model=WeeklyPlanResponse)
 async def get_full_week(user_id: str, date: str = None, db: Session = Depends(get_db)):
     """
-    Get full week view for a user.
+    Get full week view for a user with all 7 days.
     
     Args:
         user_id: User identifier
@@ -580,7 +793,7 @@ async def get_full_week(user_id: str, date: str = None, db: Session = Depends(ge
         db: Database session
         
     Returns:
-        Full weekly plan
+        Complete weekly plan with all 7 daily plans
     """
     try:
         from datetime import date as date_type
@@ -600,14 +813,67 @@ async def get_full_week(user_id: str, date: str = None, db: Session = Depends(ge
                 detail=f"No active weekly plan found for user {user_id} on {target_date}"
             )
         
-        # Convert to dict
-        planner = WeeklyPlanner()
-        weekly_plan = planner._model_to_dict(db_plan)
+        # Convert to response format
+        daily_plans = []
+        for db_day in db_plan.daily_plans:
+            meals = []
+            for db_meal in db_day.meals:
+                meal = WeeklyPlanMeal(
+                    meal_type=db_meal.meal_type,
+                    recipe_id=db_meal.recipe_id,
+                    recipe_title=db_meal.recipe_title,
+                    servings=db_meal.servings,
+                    nutrition_per_serving={
+                        "kcal": db_meal.kcal_per_serving,
+                        "protein_g": db_meal.protein_g_per_serving,
+                        "carbs_g": db_meal.carbs_g_per_serving,
+                        "fat_g": db_meal.fat_g_per_serving
+                    },
+                    total_nutrition={
+                        "kcal": db_meal.total_kcal,
+                        "protein_g": db_meal.total_protein_g,
+                        "carbs_g": db_meal.total_carbs_g,
+                        "fat_g": db_meal.total_fat_g
+                    },
+                    ingredients=db_meal.ingredients,
+                    instructions=db_meal.instructions,
+                    prep_time_min=db_meal.prep_time_min,
+                    cook_time_min=db_meal.cook_time_min
+                )
+                meals.append(meal)
+            
+            daily_plan = DailyPlanResponse(
+                day_plan_id=db_day.day_plan_id,
+                day_index=db_day.day_index,
+                date=db_day.date.isoformat(),
+                day_name=db_day.day_name,
+                activity_level=db_day.activity_level,
+                meals=meals,
+                total_nutrition={
+                    "kcal": db_day.total_kcal,
+                    "protein_g": db_day.total_protein_g,
+                    "carbs_g": db_day.total_carbs_g,
+                    "fat_g": db_day.total_fat_g
+                },
+                adjusted_targets={
+                    "target_kcal": db_day.target_kcal,
+                    "protein_g": db_day.target_protein_g,
+                    "carbs_g": db_day.target_carbs_g,
+                    "fat_g": db_day.target_fat_g
+                }
+            )
+            daily_plans.append(daily_plan)
         
-        return {
-            "status": "success",
-            "weekly_plan": weekly_plan
-        }
+        return WeeklyPlanResponse(
+            week_plan_id=db_plan.week_plan_id,
+            user_id=db_plan.user_id,
+            start_date=db_plan.start_date.isoformat(),
+            end_date=db_plan.end_date.isoformat(),
+            activity_pattern=db_plan.activity_pattern,
+            variety_score=db_plan.variety_score,
+            max_recipe_repeats=db_plan.max_recipe_repeats,
+            daily_plans=daily_plans
+        )
         
     except HTTPException:
         raise
@@ -619,7 +885,7 @@ async def get_full_week(user_id: str, date: str = None, db: Session = Depends(ge
         )
 
 
-@router.post("/regenerate-day")
+@router.post("/regenerate-day", response_model=WeeklyPlanResponse)
 async def regenerate_day(
     week_plan_id: str,
     day_index: int,
@@ -636,7 +902,7 @@ async def regenerate_day(
         db: Database session
         
     Returns:
-        Updated weekly plan
+        Updated complete weekly plan with all 7 days
     """
     try:
         from src.models.schemas import UserProfile
@@ -662,10 +928,71 @@ async def regenerate_day(
         
         logger.info(f"Regenerated day {day_index} in weekly plan {week_plan_id}")
         
-        return {
-            "status": "success",
-            "weekly_plan": updated_plan
-        }
+        # Fetch updated plan from database to get complete data
+        repository = WeeklyPlanRepository(db)
+        db_plan = repository.get_weekly_plan(week_plan_id)
+        
+        # Convert to response format
+        daily_plans = []
+        for db_day in db_plan.daily_plans:
+            meals = []
+            for db_meal in db_day.meals:
+                meal = WeeklyPlanMeal(
+                    meal_type=db_meal.meal_type,
+                    recipe_id=db_meal.recipe_id,
+                    recipe_title=db_meal.recipe_title,
+                    servings=db_meal.servings,
+                    nutrition_per_serving={
+                        "kcal": db_meal.kcal_per_serving,
+                        "protein_g": db_meal.protein_g_per_serving,
+                        "carbs_g": db_meal.carbs_g_per_serving,
+                        "fat_g": db_meal.fat_g_per_serving
+                    },
+                    total_nutrition={
+                        "kcal": db_meal.total_kcal,
+                        "protein_g": db_meal.total_protein_g,
+                        "carbs_g": db_meal.total_carbs_g,
+                        "fat_g": db_meal.total_fat_g
+                    },
+                    ingredients=db_meal.ingredients,
+                    instructions=db_meal.instructions,
+                    prep_time_min=db_meal.prep_time_min,
+                    cook_time_min=db_meal.cook_time_min
+                )
+                meals.append(meal)
+            
+            daily_plan = DailyPlanResponse(
+                day_plan_id=db_day.day_plan_id,
+                day_index=db_day.day_index,
+                date=db_day.date.isoformat(),
+                day_name=db_day.day_name,
+                activity_level=db_day.activity_level,
+                meals=meals,
+                total_nutrition={
+                    "kcal": db_day.total_kcal,
+                    "protein_g": db_day.total_protein_g,
+                    "carbs_g": db_day.total_carbs_g,
+                    "fat_g": db_day.total_fat_g
+                },
+                adjusted_targets={
+                    "target_kcal": db_day.target_kcal,
+                    "protein_g": db_day.target_protein_g,
+                    "carbs_g": db_day.target_carbs_g,
+                    "fat_g": db_day.target_fat_g
+                }
+            )
+            daily_plans.append(daily_plan)
+        
+        return WeeklyPlanResponse(
+            week_plan_id=db_plan.week_plan_id,
+            user_id=db_plan.user_id,
+            start_date=db_plan.start_date.isoformat(),
+            end_date=db_plan.end_date.isoformat(),
+            activity_pattern=db_plan.activity_pattern,
+            variety_score=updated_plan.get('recipe_variety_score', db_plan.variety_score),
+            max_recipe_repeats=db_plan.max_recipe_repeats,
+            daily_plans=daily_plans
+        )
         
     except HTTPException:
         raise
@@ -772,4 +1099,601 @@ async def get_user_weekly_plans(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to retrieve weekly plans: {str(e)}"
+        )
+
+
+
+# Progress Tracking Endpoints
+
+@router.post("/log-progress", response_model=ProgressLogResponse)
+async def log_progress(request: ProgressLogRequest, db: Session = Depends(get_db)):
+    """
+    Log daily progress (weight and adherence).
+    
+    Args:
+        request: Progress log data
+        db: Database session
+        
+    Returns:
+        Created progress log
+    """
+    try:
+        from src.services.progress_service import ProgressService
+        from datetime import datetime
+        
+        service = ProgressService(db)
+        
+        # Parse date
+        log_date = datetime.fromisoformat(request.date).date()
+        
+        # Create log
+        log = service.log_progress(
+            user_id=request.user_id,
+            log_date=log_date,
+            actual_weight_kg=request.actual_weight_kg,
+            adherence_score=request.adherence_score,
+            notes=request.notes,
+            energy_level=request.energy_level,
+            hunger_level=request.hunger_level
+        )
+        
+        return ProgressLogResponse(
+            log_id=log.log_id,
+            user_id=log.user_id,
+            log_date=log.log_date.isoformat(),
+            actual_weight_kg=log.actual_weight_kg,
+            adherence_score=log.adherence_score,
+            notes=log.notes,
+            energy_level=log.energy_level,
+            hunger_level=log.hunger_level,
+            created_at=log.created_at.isoformat()
+        )
+        
+    except Exception as e:
+        logger.error(f"Error logging progress: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to log progress: {str(e)}"
+        )
+
+
+@router.get("/progress/{user_id}", response_model=ProgressHistoryResponse)
+async def get_progress_history(
+    user_id: str,
+    days: int = 90,
+    analyze: bool = True,
+    db: Session = Depends(get_db)
+):
+    """
+    Get progress history and analysis for a user.
+    
+    Args:
+        user_id: User identifier
+        days: Number of days to retrieve (default 90)
+        analyze: Whether to include progress analysis (default True)
+        db: Database session
+        
+    Returns:
+        Progress history with optional analysis
+    """
+    try:
+        from src.services.progress_service import ProgressService
+        
+        service = ProgressService(db)
+        
+        # Get logs
+        logs = service.get_progress_history(user_id, days=days)
+        
+        # Convert to response format
+        log_responses = []
+        for log in logs:
+            log_responses.append(ProgressLogResponse(
+                log_id=log.log_id,
+                user_id=log.user_id,
+                log_date=log.log_date.isoformat(),
+                actual_weight_kg=log.actual_weight_kg,
+                adherence_score=log.adherence_score,
+                notes=log.notes,
+                energy_level=log.energy_level,
+                hunger_level=log.hunger_level,
+                created_at=log.created_at.isoformat()
+            ))
+        
+        # Analyze if requested
+        analysis = None
+        if analyze and len(logs) >= 2:
+            analysis_dict = service.analyze_progress(user_id, days=min(days, 30))
+            if analysis_dict:
+                analysis = ProgressAnalysis(**analysis_dict)
+        
+        return ProgressHistoryResponse(
+            user_id=user_id,
+            logs=log_responses,
+            analysis=analysis,
+            total_logs=len(log_responses)
+        )
+        
+    except Exception as e:
+        logger.error(f"Error retrieving progress history: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to retrieve progress history: {str(e)}"
+        )
+
+
+@router.post("/analyze-progress/{user_id}")
+async def analyze_progress(
+    user_id: str,
+    days: int = 30,
+    apply_adjustment: bool = False,
+    db: Session = Depends(get_db)
+):
+    """
+    Analyze user progress and optionally apply calorie adjustments.
+    
+    Args:
+        user_id: User identifier
+        days: Number of days to analyze (default 30)
+        apply_adjustment: Whether to apply recommended adjustments (default False)
+        db: Database session
+        
+    Returns:
+        Progress analysis with recommendations
+    """
+    try:
+        from src.services.progress_service import ProgressService
+        
+        service = ProgressService(db)
+        
+        # Analyze progress
+        analysis = service.analyze_progress(user_id, days=days)
+        
+        if not analysis:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Insufficient data for analysis. Need at least 2 progress logs."
+            )
+        
+        # Apply adjustment if requested
+        adjustment = None
+        if apply_adjustment and analysis.get("calorie_adjustment_needed"):
+            adjustment = service.apply_calorie_adjustment(user_id, analysis)
+            if adjustment:
+                analysis["adjustment_applied"] = True
+                analysis["adjustment_id"] = adjustment.adjustment_id
+        
+        return {
+            "status": "success",
+            "analysis": analysis
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error analyzing progress: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to analyze progress: {str(e)}"
+        )
+
+
+
+# Personalization Endpoints
+
+@router.post("/feedback")
+async def submit_feedback(
+    request: 'RecipeFeedbackRequest',
+    db: Session = Depends(get_db)
+):
+    """
+    Submit recipe feedback (like/dislike).
+    
+    Args:
+        request: Feedback request with user_id, recipe_id, liked
+        db: Database session
+        
+    Returns:
+        Feedback confirmation
+    """
+    from src.models.schemas import RecipeFeedbackRequest, RecipeFeedbackResponse
+    from src.services.preference_service import PreferenceService
+    
+    try:
+        logger.info(f"Submitting feedback for user {request.user_id} on recipe {request.recipe_id}")
+        
+        service = PreferenceService(db)
+        
+        # Submit feedback (upsert logic in service)
+        feedback = service.submit_feedback(
+            user_id=request.user_id,
+            recipe_id=request.recipe_id,
+            liked=request.liked
+        )
+        
+        return RecipeFeedbackResponse(**feedback, status="success")
+        
+    except Exception as e:
+        logger.error(f"Error submitting feedback: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to submit feedback: {str(e)}"
+        )
+
+
+@router.get("/feedback/{user_id}")
+async def get_user_feedback(
+    user_id: str,
+    limit: int = 100,
+    offset: int = 0,
+    db: Session = Depends(get_db)
+):
+    """
+    Get user's feedback summary.
+    
+    Args:
+        user_id: User identifier
+        limit: Maximum number of results
+        offset: Number of results to skip
+        db: Database session
+        
+    Returns:
+        Lists of liked and disliked recipes
+    """
+    from src.models.schemas import UserFeedbackSummary
+    from src.services.preference_service import PreferenceService
+    
+    try:
+        logger.info(f"Retrieving feedback for user {user_id}")
+        
+        service = PreferenceService(db)
+        
+        prefs = service.get_user_preferences(user_id)
+        
+        return UserFeedbackSummary(
+            user_id=user_id,
+            liked_recipes=list(prefs["liked_recipes"]),
+            disliked_recipes=list(prefs["disliked_recipes"]),
+            total_feedback_count=len(prefs["liked_recipes"]) + len(prefs["disliked_recipes"])
+        )
+        
+    except Exception as e:
+        logger.error(f"Error retrieving feedback: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to retrieve feedback: {str(e)}"
+        )
+
+
+@router.put("/user-preferences/{user_id}")
+async def update_user_preferences(
+    user_id: str,
+    request: 'UserPreferencesRequest',
+    db: Session = Depends(get_db)
+):
+    """
+    Update user preferences (regional profile).
+    
+    Args:
+        user_id: User identifier
+        request: Preferences update request
+        db: Database session
+        
+    Returns:
+        Updated preferences
+    """
+    from src.models.schemas import UserPreferencesRequest, UserPreferencesResponse
+    from src.services.preference_service import PreferenceService
+    
+    try:
+        logger.info(f"Updating preferences for user {user_id}")
+        
+        service = PreferenceService(db)
+        
+        prefs = service.update_regional_profile(
+            user_id=user_id,
+            regional_profile=request.regional_profile.value
+        )
+        
+        return UserPreferencesResponse(**prefs)
+        
+    except Exception as e:
+        logger.error(f"Error updating preferences: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to update preferences: {str(e)}"
+        )
+
+
+@router.get("/feedback-stats/{user_id}")
+async def get_feedback_stats(
+    user_id: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Get user feedback statistics and insights.
+    
+    Args:
+        user_id: User identifier
+        db: Database session
+        
+    Returns:
+        Preference statistics
+    """
+    from src.models.schemas import FeedbackStats
+    from src.services.preference_service import PreferenceService
+    
+    try:
+        logger.info(f"Retrieving feedback stats for user {user_id}")
+        
+        service = PreferenceService(db)
+        
+        stats = service.get_feedback_stats(user_id)
+        
+        return FeedbackStats(**stats)
+        
+    except Exception as e:
+        logger.error(f"Error retrieving feedback stats: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to retrieve feedback stats: {str(e)}"
+        )
+
+
+@router.delete("/feedback/{user_id}")
+async def delete_user_feedback(
+    user_id: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Delete all feedback for a user.
+    
+    Args:
+        user_id: User identifier
+        db: Database session
+        
+    Returns:
+        Deletion confirmation
+    """
+    from src.services.preference_service import PreferenceService
+    
+    try:
+        logger.info(f"Deleting feedback for user {user_id}")
+        
+        service = PreferenceService(db)
+        
+        success = service.delete_user_feedback(user_id)
+        
+        if success:
+            return {"status": "success", "message": "Feedback deleted"}
+        else:
+            raise HTTPException(status_code=404, detail="No feedback found")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting feedback: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to delete feedback: {str(e)}"
+        )
+
+
+
+@router.post("/generate-plan-html")
+async def generate_plan_html(
+    request: 'GeneratePlanRequest',
+    include_debug: bool = False,
+    engine: 'NutritionEngine' = Depends(get_nutrition_engine),
+    rag: 'RAGModule' = Depends(get_rag_module),
+    val: 'MealPlanValidator' = Depends(get_validator)
+):
+    """
+    Generate meal plan and return HTML presentation.
+    
+    Args:
+        request: User profile and preferences
+        include_debug: Include detailed scoring breakdown
+        
+    Returns:
+        HTML formatted meal plan
+    """
+    from src.models.schemas import GeneratePlanRequest
+    from src.utils.markdown_renderer import MarkdownRenderer
+    
+    try:
+        # Generate plan using existing logic
+        response = await generate_plan(request, include_debug, engine, rag, None, val)
+        
+        # Convert to HTML if enhanced presentation exists
+        if response.enhanced_presentation:
+            html_content = MarkdownRenderer.render_to_html(response.enhanced_presentation)
+            
+            return {
+                "html": html_content,
+                "meal_plan": response.meal_plan,
+                "status": "success"
+            }
+        else:
+            return {
+                "html": None,
+                "meal_plan": response.meal_plan,
+                "status": "success",
+                "message": "No enhanced presentation generated"
+            }
+            
+    except Exception as e:
+        logger.error(f"Error generating HTML plan: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(e)}"
+        )
+
+
+
+# User Preferences Endpoints
+
+@router.get("/user-preferences/{user_id}")
+async def get_user_preferences(
+    user_id: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Get user preferences including regional profile.
+    
+    Args:
+        user_id: User identifier
+        db: Database session
+        
+    Returns:
+        User preferences
+    """
+    from src.services.preference_service import PreferenceService
+    
+    try:
+        logger.info(f"Retrieving preferences for user {user_id}")
+        
+        service = PreferenceService(db)
+        preferences = service.get_user_preferences(user_id)
+        
+        return {
+            "user_id": user_id,
+            "regional_profile": preferences.get("regional_profile", "global"),
+            "liked_recipes": list(preferences.get("liked_recipes", set())),
+            "disliked_recipes": list(preferences.get("disliked_recipes", set())),
+            "status": "success"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error retrieving preferences: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to retrieve preferences: {str(e)}"
+        )
+
+
+@router.put("/user-preferences/{user_id}")
+async def update_user_preferences(
+    user_id: str,
+    preferences_data: Dict[str, Any],
+    db: Session = Depends(get_db)
+):
+    """
+    Update user preferences.
+    
+    Args:
+        user_id: User identifier
+        preferences_data: Preferences to update (regional_profile, etc.)
+        db: Database session
+        
+    Returns:
+        Updated preferences
+    """
+    from src.services.preference_service import PreferenceService
+    
+    try:
+        logger.info(f"Updating preferences for user {user_id}: {preferences_data}")
+        
+        service = PreferenceService(db)
+        
+        # Update regional profile if provided
+        regional_profile = preferences_data.get("regional_profile")
+        if regional_profile:
+            service.set_regional_preference(user_id, regional_profile)
+            logger.info(f"Updated regional profile to {regional_profile} for user {user_id}")
+        
+        # Return updated preferences
+        preferences = service.get_user_preferences(user_id)
+        
+        return {
+            "user_id": user_id,
+            "regional_profile": preferences.get("regional_profile", "global"),
+            "status": "success",
+            "message": "Preferences updated successfully"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error updating preferences: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to update preferences: {str(e)}"
+        )
+
+
+@router.get("/feedback/{user_id}")
+async def get_user_feedback(
+    user_id: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Get user's recipe feedback (liked and disliked recipes).
+    
+    Args:
+        user_id: User identifier
+        db: Database session
+        
+    Returns:
+        User feedback data
+    """
+    from src.services.preference_service import PreferenceService
+    
+    try:
+        logger.info(f"Retrieving feedback for user {user_id}")
+        
+        service = PreferenceService(db)
+        preferences = service.get_user_preferences(user_id)
+        
+        return {
+            "user_id": user_id,
+            "liked_recipes": list(preferences.get("liked_recipes", set())),
+            "disliked_recipes": list(preferences.get("disliked_recipes", set())),
+            "status": "success"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error retrieving feedback: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to retrieve feedback: {str(e)}"
+        )
+
+
+@router.get("/feedback-stats/{user_id}")
+async def get_feedback_stats(
+    user_id: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Get statistics about user's recipe feedback.
+    
+    Args:
+        user_id: User identifier
+        db: Database session
+        
+    Returns:
+        Feedback statistics
+    """
+    from src.services.preference_service import PreferenceService
+    
+    try:
+        logger.info(f"Retrieving feedback stats for user {user_id}")
+        
+        service = PreferenceService(db)
+        preferences = service.get_user_preferences(user_id)
+        
+        liked = preferences.get("liked_recipes", set())
+        disliked = preferences.get("disliked_recipes", set())
+        
+        return {
+            "user_id": user_id,
+            "total_liked": len(liked),
+            "total_disliked": len(disliked),
+            "total_feedback": len(liked) + len(disliked),
+            "status": "success"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error retrieving feedback stats: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to retrieve feedback stats: {str(e)}"
         )

@@ -24,16 +24,7 @@ wheels/
 venv/
 env/
 ENV/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Environment variables
-.env
+.venv/
 
 # Database
 *.db
@@ -41,28 +32,80 @@ ENV/
 *.sqlite3
 diet_planner.db
 
-# Models and cache
-models/
-.cache/
-*.pkl
-*.pth
+# Vector Database
+chroma_db/
+.chroma/
+chromadb/
 
-# Vector DB
-data/vector_db/
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.project
+.pydevproject
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
 
 # Logs
 *.log
 logs/
+*.log.*
 
 # OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
-
-# Test files
-test_*.py
-*_test.py
-minimal_test.py
 
 # Temporary files
 *.tmp
 *.bak
+*~
+.cache/
+
+# Model cache
+models/
+.cache/
+huggingface/
+
+# Test files (optional - remove if you want to include tests)
+# test_*.py
+# *_test.py
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/

@@ -63,7 +63,9 @@ class WeeklyPlanner:
         user_profile: UserProfile,
         activity_pattern: Dict[str, str] = None,
         start_date: datetime = None,
-        max_recipe_repeats: int = 2
+        max_recipe_repeats: int = 2,
+        include_debug: bool = False,
+        user_preferences: Optional[Dict] = None
     ) -> Dict:
         """
         Generate a 7-day meal plan with recipe variety.
@@ -74,11 +76,21 @@ class WeeklyPlanner:
                              e.g., {"monday": "active", "tuesday": "rest", ...}
             start_date: Start date for the week (defaults to today)
             max_recipe_repeats: Maximum times a recipe can repeat in the week
+            include_debug: Include detailed scoring breakdown in meals
+            user_preferences: Optional user preferences (liked/disliked/regional)
             
         Returns:
             Weekly meal plan dictionary
         """
         logger.info(f"Generating weekly meal plan for user: {user_profile.user_id}")
+        
+        # Default user preferences if not provided
+        if user_preferences is None:
+            user_preferences = {
+                "liked_recipes": set(),
+                "disliked_recipes": set(),
+                "regional_profile": "global"
+            }
         
         # Default activity pattern if not provided
         if activity_pattern is None:
@@ -99,6 +111,7 @@ class WeeklyPlanner:
         week_plan_id = f"week_{uuid.uuid4().hex[:12]}"
         days = []
         recipe_usage = Counter()  # Track recipe usage across the week
+        recently_used_recipes = set()  # Track recently used recipes for diversity
         
         day_names = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
         
@@ -117,15 +130,23 @@ class WeeklyPlanner:
             # Calculate nutrition targets for this day
             nutrition_targets = self.nutrition_engine.calculate_nutrition_targets(adjusted_profile)
             
-            # Retrieve recipe candidates with variety constraints
+            # Retrieve recipe candidates with preferences and variety constraints
             meal_candidates = {}
             for meal_type, target_kcal in nutrition_targets.meal_splits.items():
-                candidates = self.rag_module.retrieve_candidates(
+                # Use preference-aware scoring with recently used recipes for diversity
+                candidates = self.rag_module.retrieve_candidates_with_preferences(
                     meal_type=meal_type,
                     target_kcal=target_kcal,
                     diet_pref=adjusted_profile.diet_pref,
                     allergens=adjusted_profile.allergies,
-                    top_k=10  # Get more candidates for variety
+                    user_skill=adjusted_profile.cooking_skill,
+                    max_prep_time=None,  # Could be added based on day schedule
+                    recently_used_recipes=recently_used_recipes,
+                    liked_recipes=user_preferences["liked_recipes"],
+                    disliked_recipes=user_preferences["disliked_recipes"],
+                    regional_profile=user_preferences["regional_profile"],
+                    top_k=20,  # Get MORE candidates for better variety
+                    include_debug=include_debug
                 )
                 
                 # Filter out overused recipes
@@ -135,7 +156,8 @@ class WeeklyPlanner:
                     max_recipe_repeats
                 )
                 
-                meal_candidates[meal_type] = filtered_candidates[:3]  # Top 3 after filtering
+                # Pass more candidates to give simple_planner more options
+                meal_candidates[meal_type] = filtered_candidates[:5]  # Top 5 after filtering for more variety
             
             # Generate daily meal plan
             daily_plan = self.simple_planner.generate_plan(
@@ -144,10 +166,11 @@ class WeeklyPlanner:
                 meal_targets=nutrition_targets.meal_splits
             )
             
-            # Update recipe usage counter
+            # Update recipe usage counter and recently used set
             for meal in daily_plan["meals"]:
                 recipe_id = meal["recipe_id"]
                 recipe_usage[recipe_id] += 1
+                recently_used_recipes.add(recipe_id)
             
             # Add day information
             day_plan = {
@@ -249,12 +272,17 @@ class WeeklyPlanner:
         """
         filtered = []
         for candidate in candidates:
-            if recipe_usage[candidate.recipe_id] < max_repeats:
+            usage_count = recipe_usage.get(candidate.recipe_id, 0)
+            if usage_count < max_repeats:
                 filtered.append(candidate)
+            else:
+                logger.debug(f"Filtering out {candidate.recipe_id} (used {usage_count} times, max {max_repeats})")
+        
+        logger.info(f"Filtered {len(candidates)} candidates to {len(filtered)} (max_repeats={max_repeats})")
         
         # If all recipes are overused, return original list (better than no recipes)
         if not filtered:
-            logger.warning("All candidates overused, returning original list")
+            logger.warning(f"All {len(candidates)} candidates overused, returning original list")
             return candidates
         
         return filtered
@@ -375,7 +403,9 @@ class WeeklyPlanner:
         user_profile: UserProfile,
         activity_pattern: Dict[str, str] = None,
         start_date: datetime = None,
-        max_recipe_repeats: int = 2
+        max_recipe_repeats: int = 2,
+        include_debug: bool = False,
+        user_preferences: Optional[Dict] = None
     ) -> Dict:
         """
         Generate weekly plan and save to database.
@@ -394,8 +424,10 @@ class WeeklyPlanner:
             user_profile=user_profile,
             activity_pattern=activity_pattern,
             start_date=start_date,
-            max_recipe_repeats=max_recipe_repeats
-        )
+            max_recipe_repeats=max_recipe_repeats,
+            include_debug=include_debug,
+            user_preferences=user_preferences
+        )  
         
         # Save to database if repository available
         if self.repository:

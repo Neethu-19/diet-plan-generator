@@ -697,3 +697,241 @@ class WeeklyPlanRepository:
             DailyPlanModel.date == tomorrow,
             WeeklyPlanModel.is_archived == False
         ).first()
+
+
+
+class PreferenceRepository:
+    """Repository for user preference and feedback operations."""
+    
+    def __init__(self, db: Session):
+        self.db = db
+    
+    # Recipe Feedback Methods
+    
+    def create_feedback(
+        self,
+        feedback_id: str,
+        user_id: str,
+        recipe_id: str,
+        liked: bool
+    ) -> 'RecipeFeedbackModel':
+        """
+        Create new recipe feedback.
+        
+        Args:
+            feedback_id: Unique feedback identifier
+            user_id: User identifier
+            recipe_id: Recipe identifier
+            liked: Whether user liked the recipe
+            
+        Returns:
+            Created RecipeFeedbackModel
+        """
+        from src.data.models import RecipeFeedbackModel
+        
+        db_feedback = RecipeFeedbackModel(
+            feedback_id=feedback_id,
+            user_id=user_id,
+            recipe_id=recipe_id,
+            liked=liked,
+            feedback_date=datetime.utcnow(),
+            updated_at=datetime.utcnow()
+        )
+        
+        self.db.add(db_feedback)
+        self.db.commit()
+        self.db.refresh(db_feedback)
+        
+        logger.info(f"Created feedback {feedback_id} for user {user_id} on recipe {recipe_id}")
+        
+        return db_feedback
+    
+    def get_feedback(
+        self,
+        user_id: str,
+        recipe_id: str
+    ) -> Optional['RecipeFeedbackModel']:
+        """
+        Get feedback for a specific user and recipe.
+        
+        Args:
+            user_id: User identifier
+            recipe_id: Recipe identifier
+            
+        Returns:
+            RecipeFeedbackModel or None
+        """
+        from src.data.models import RecipeFeedbackModel
+        
+        return self.db.query(RecipeFeedbackModel).filter(
+            RecipeFeedbackModel.user_id == user_id,
+            RecipeFeedbackModel.recipe_id == recipe_id
+        ).first()
+    
+    def get_all_feedback(
+        self,
+        user_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None
+    ) -> List['RecipeFeedbackModel']:
+        """
+        Get all feedback for a user.
+        
+        Args:
+            user_id: User identifier
+            limit: Maximum number of results
+            offset: Number of results to skip
+            
+        Returns:
+            List of RecipeFeedbackModel
+        """
+        from src.data.models import RecipeFeedbackModel
+        
+        query = self.db.query(RecipeFeedbackModel).filter(
+            RecipeFeedbackModel.user_id == user_id
+        ).order_by(RecipeFeedbackModel.feedback_date.desc())
+        
+        if limit:
+            query = query.limit(limit)
+        if offset:
+            query = query.offset(offset)
+        
+        return query.all()
+    
+    def update_feedback(
+        self,
+        feedback_id: str,
+        liked: bool
+    ) -> 'RecipeFeedbackModel':
+        """
+        Update existing feedback.
+        
+        Args:
+            feedback_id: Feedback identifier
+            liked: New liked status
+            
+        Returns:
+            Updated RecipeFeedbackModel
+        """
+        from src.data.models import RecipeFeedbackModel
+        
+        db_feedback = self.db.query(RecipeFeedbackModel).filter(
+            RecipeFeedbackModel.feedback_id == feedback_id
+        ).first()
+        
+        if db_feedback:
+            db_feedback.liked = liked
+            db_feedback.updated_at = datetime.utcnow()
+            self.db.commit()
+            self.db.refresh(db_feedback)
+            
+            logger.info(f"Updated feedback {feedback_id} to liked={liked}")
+        
+        return db_feedback
+    
+    def delete_all_feedback(
+        self,
+        user_id: str
+    ) -> bool:
+        """
+        Delete all feedback for a user.
+        
+        Args:
+            user_id: User identifier
+            
+        Returns:
+            True if successful
+        """
+        from src.data.models import RecipeFeedbackModel
+        
+        deleted_count = self.db.query(RecipeFeedbackModel).filter(
+            RecipeFeedbackModel.user_id == user_id
+        ).delete()
+        
+        self.db.commit()
+        
+        logger.info(f"Deleted {deleted_count} feedback records for user {user_id}")
+        
+        return deleted_count > 0
+    
+    # User Preferences Methods
+    
+    def get_user_preferences(
+        self,
+        user_id: str
+    ) -> Optional['UserPreferencesModel']:
+        """
+        Get user preferences.
+        
+        Args:
+            user_id: User identifier
+            
+        Returns:
+            UserPreferencesModel or None
+        """
+        from src.data.models import UserPreferencesModel
+        
+        return self.db.query(UserPreferencesModel).filter(
+            UserPreferencesModel.user_id == user_id
+        ).first()
+    
+    def create_user_preferences(
+        self,
+        user_id: str,
+        regional_profile: str = "global"
+    ) -> 'UserPreferencesModel':
+        """
+        Create user preferences.
+        
+        Args:
+            user_id: User identifier
+            regional_profile: Regional cuisine preference
+            
+        Returns:
+            Created UserPreferencesModel
+        """
+        from src.data.models import UserPreferencesModel
+        
+        db_prefs = UserPreferencesModel(
+            user_id=user_id,
+            regional_profile=regional_profile,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
+        )
+        
+        self.db.add(db_prefs)
+        self.db.commit()
+        self.db.refresh(db_prefs)
+        
+        logger.info(f"Created preferences for user {user_id} with region {regional_profile}")
+        
+        return db_prefs
+    
+    def update_regional_profile(
+        self,
+        user_id: str,
+        regional_profile: str
+    ) -> 'UserPreferencesModel':
+        """
+        Update user's regional profile.
+        
+        Args:
+            user_id: User identifier
+            regional_profile: New regional profile
+            
+        Returns:
+            Updated UserPreferencesModel
+        """
+        from src.data.models import UserPreferencesModel
+        
+        db_prefs = self.get_user_preferences(user_id)
+        
+        if db_prefs:
+            db_prefs.regional_profile = regional_profile
+            db_prefs.updated_at = datetime.utcnow()
+            self.db.commit()
+            self.db.refresh(db_prefs)
+            
+            logger.info(f"Updated regional profile for user {user_id} to {regional_profile}")
+        
+        return db_prefs

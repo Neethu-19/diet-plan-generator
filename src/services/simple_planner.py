@@ -55,12 +55,25 @@ class SimplePlanner:
                 continue
             
             # Select top candidate that hasn't been used yet
+            # Add slight randomization to avoid always picking the same recipe
+            import random
+            
             selected = None
-            for candidate in candidates:
-                if candidate.recipe_id not in used_recipe_ids:
-                    selected = candidate
-                    used_recipe_ids.add(candidate.recipe_id)
-                    break
+            available_candidates = [c for c in candidates if c.recipe_id not in used_recipe_ids]
+            
+            if available_candidates:
+                # Pick from top candidates with slight preference for higher scores
+                # This adds variety while still respecting quality
+                if len(available_candidates) > 1:
+                    # 70% chance to pick top candidate, 30% for others
+                    if random.random() < 0.7:
+                        selected = available_candidates[0]
+                    else:
+                        selected = random.choice(available_candidates[:min(3, len(available_candidates))])
+                else:
+                    selected = available_candidates[0]
+                
+                used_recipe_ids.add(selected.recipe_id)
             
             # If all candidates were used, use the top one anyway
             if selected is None:
@@ -105,11 +118,9 @@ class SimplePlanner:
                 "nutrition_status": "INDEXED_RECIPE"
             }
             
-            # Add explainability if available
-            if hasattr(selected, 'score_breakdown'):
-                meal["score_breakdown"] = selected.score_breakdown
-            if hasattr(selected, 'selection_explanation'):
-                meal["selection_explanation"] = selected.selection_explanation
+            # Add debug ranking if available (for explainability)
+            if hasattr(selected, 'score_breakdown') and selected.score_breakdown:
+                meal["debug_ranking"] = selected.score_breakdown
             
             meals.append(meal)
             

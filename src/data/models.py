@@ -32,6 +32,8 @@ class UserProfileModel(Base):
     # Relationships
     meal_plans = relationship("MealPlanModel", back_populates="user")
     weekly_plans = relationship("WeeklyPlanModel", back_populates="user")
+    progress_logs = relationship("ProgressLogModel", back_populates="user")
+    calorie_adjustments = relationship("CalorieAdjustmentModel", back_populates="user")
 
 
 class MealPlanModel(Base):
@@ -162,3 +164,85 @@ class PlanMealModel(Base):
     
     # Relationships
     daily_plan = relationship("DailyPlanModel", back_populates="meals")
+
+
+class ProgressLogModel(Base):
+    """Progress tracking for adaptive meal planning."""
+    __tablename__ = "progress_logs"
+    
+    log_id = Column(String, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("user_profiles.user_id"), nullable=False, index=True)
+    log_date = Column(Date, nullable=False, index=True)
+    
+    # Actual measurements
+    actual_weight_kg = Column(Float, nullable=False)
+    adherence_score = Column(Float, nullable=False)  # 0.0 to 1.0
+    
+    # Optional fields
+    notes = Column(Text, nullable=True)
+    energy_level = Column(Integer, nullable=True)  # 1-5 scale
+    hunger_level = Column(Integer, nullable=True)  # 1-5 scale
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("UserProfileModel", back_populates="progress_logs")
+
+
+class CalorieAdjustmentModel(Base):
+    """Track calorie adjustments made by the adaptive system."""
+    __tablename__ = "calorie_adjustments"
+    
+    adjustment_id = Column(String, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("user_profiles.user_id"), nullable=False, index=True)
+    adjustment_date = Column(DateTime, default=datetime.utcnow, index=True)
+    
+    # Adjustment details
+    previous_target_kcal = Column(Float, nullable=False)
+    new_target_kcal = Column(Float, nullable=False)
+    adjustment_amount = Column(Float, nullable=False)  # Can be negative
+    
+    # Reason for adjustment
+    reason = Column(String, nullable=False)  # "too_slow", "too_fast", "on_track"
+    actual_progress_rate = Column(Float, nullable=True)  # kg/week
+    expected_progress_rate = Column(Float, nullable=True)  # kg/week
+    average_adherence = Column(Float, nullable=True)
+    
+    # Analysis period
+    analysis_start_date = Column(Date, nullable=True)
+    analysis_end_date = Column(Date, nullable=True)
+    num_logs_analyzed = Column(Integer, nullable=True)
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("UserProfileModel", back_populates="calorie_adjustments")
+
+
+class RecipeFeedbackModel(Base):
+    """Recipe feedback table for user preferences."""
+    __tablename__ = "recipe_feedback"
+    
+    feedback_id = Column(String, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("user_profiles.user_id"), nullable=False, index=True)
+    recipe_id = Column(String, nullable=False, index=True)
+    liked = Column(Boolean, nullable=False)
+    feedback_date = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Composite unique constraint and indexes
+    __table_args__ = (
+        {'sqlite_autoincrement': True},
+    )
+    
+    # Note: Unique constraint on (user_id, recipe_id) will be added in migration
+
+
+class UserPreferencesModel(Base):
+    """User preferences table for personalization."""
+    __tablename__ = "user_preferences"
+    
+    user_id = Column(String, ForeignKey("user_profiles.user_id"), primary_key=True, index=True)
+    regional_profile = Column(String, default="global", nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
